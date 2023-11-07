@@ -1,16 +1,16 @@
-import path from 'path';
-import express from 'express';
-import multer from 'multer';
+import path from "path";
+import express from "express";
+import multer from "multer";
 const router = express.Router();
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename(req, file, cb) {
     cb(
       null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`,
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
     );
   },
 });
@@ -23,7 +23,7 @@ function checkFileType(file, cb) {
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Images only!');
+    cb("Images only!");
   }
 }
 
@@ -34,9 +34,10 @@ const upload = multer({
   },
 });
 
-router.post('/', upload.single('image'), (req, res) => {
+router.post("/", upload.single("image"), (req, res) => {
   // Replace is necessary since windows uses "\" for directories
-  res.send(`/${req.file.path.replace(/\\/g, '/')}`);
+  console.log(req.file.path);
+  res.send(`/${req.file.path.replace(/\\/g, "/")}`);
 });
 
 export default router;

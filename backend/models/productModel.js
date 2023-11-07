@@ -1,18 +1,16 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const reviewSchema = mongoose.Schema(
   {
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: 'User',
-    // },
-    name: { type: String, required: true },
-    title: { type: String, required: true },
-    rating: { type: Number, required: true, default: 1 },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    rating: { type: Number, required: true, default: 0 },
     comment: { type: String, required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const productModel = mongoose.Schema(
@@ -20,29 +18,25 @@ const productModel = mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'User',
+      ref: "User",
     },
     name: { type: String, required: true },
     image: { type: String, required: true },
-    brand: { type: String, required: true },
-    category: { type: String, required: true },
+    category: { type: Array, required: true },
     description: { type: String, required: true },
     reviews: [reviewSchema],
-    rating: { type: Number, required: true, default: 0 },
+    ratingSum: { type: Number, required: true, default: 0 },
     numReviews: { type: Number, required: true, default: 0 },
-    price: { type: Number, required: true, default: 0 },
+    ratingAverage: { type: Number, required: true, default: 0 },
+    unitPrice: { type: Number, required: true, default: 0 },
     countInStock: { type: Number, required: true, default: 0 },
-    featured: { type: Boolean, required: true, default: false },
-    bgColor: { type: String, required: true, default: 'f5f5f5' },
-    nameColor: { type: String, required: true, default: '000' },
-    btnColor: { type: String, required: true, default: 'fe696a' },
-    btnColorHover: { type: String, required: true, default: 'fe3638' },
+    isDeleted: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-const User = mongoose.model('Product', productModel);
+const User = mongoose.model("Product", productModel);
 
 export default User;

@@ -1,15 +1,15 @@
-import dotenv from 'dotenv';
-import users from './data/users.js';
-import products from './data/products.js';
-import homeinformations from './data/homeinformations.js';
+import dotenv from "dotenv";
+import users from "./data/users.js";
+import products from "./data/products.js";
+import homeinformations from "./data/homeinformations.js";
 
-import HomeModel from './models/homeModel.js';
-import UserModel from './models/userModel.js';
-import ProductModel from './models/productModel.js';
-import OrderModel from './models/orderModel.js';
-import connectDB from './config/db.js';
+import HomeModel from "./models/homeModel.js";
+import UserModel from "./models/userModel.js";
+import ProductModel from "./models/productModel.js";
+import OrderModel from "./models/orderModel.js";
+import connectDB from "./config/db.js";
 
-dotenv.config();
+dotenv.config({ path: "./backend/.env" });
 
 connectDB();
 
@@ -30,7 +30,7 @@ const importData = async () => {
 
     await ProductModel.insertMany(sampleProducts);
 
-    console.log('Data imported!');
+    console.log("Data imported!");
     process.exit();
   } catch (error) {
     console.error(`Error importing: ${error}`);
@@ -45,7 +45,7 @@ const purgeData = async () => {
     await ProductModel.deleteMany();
     await UserModel.deleteMany();
 
-    console.log('Data pruged!');
+    console.log("Data pruged!");
     process.exit();
   } catch (error) {
     console.error(`Error purging: ${error}`);
@@ -53,5 +53,5 @@ const purgeData = async () => {
   }
 };
 
-if (process.argv[2] === '-d' || process.argv[2] === '-D') purgeData();
+if (process.argv[2] === "-d" || process.argv[2] === "-D") purgeData();
 else importData();

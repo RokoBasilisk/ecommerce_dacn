@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import {
   addReview,
   createProductAdmin,
@@ -10,26 +10,29 @@ import {
   getProducts,
   getTopProducts,
   updateProductAdmin,
-} from '../controllers/productController.js';
-import { isAdmin, protect } from '../middleware/authMiddleware.js';
+} from "../controllers/productController.js";
+import { isShop, protect, isCustomer } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route('/').get(getProducts);
-//.post(protect, isAdmin, createProductAdmin);
+router.route("/").get(getProducts);
 
-router.route('/featured/:category?').get(getFeaturedProducts);
+router.route("/").post(protect, isShop, createProductAdmin);
 
-router.route('/top/:category?').get(getTopProducts);
+router.route("/featured/:category?").get(getFeaturedProducts);
 
-router.route('/:id').get(getProductById);
-//.delete(protect, isAdmin, deleteProductAdmin)
-//.patch(protect, isAdmin, updateProductAdmin);
+router.route("/top/:category?").get(getTopProducts);
 
-router.route('/category/name').get(getCategoryNames);
+router.route("/:id").get(getProductById);
 
-router.route('/category/:category').get(getProductByCategory);
+router.route("/:id").delete(protect, isShop, deleteProductAdmin);
 
-router.route('/:id/reviews').post(protect, addReview);
+router.route("/:id").patch(protect, isShop, updateProductAdmin);
+
+router.route("/category/name").get(getCategoryNames);
+
+router.route("/category/:category").get(getProductByCategory);
+
+router.route("/:id/reviews").post(protect, isCustomer, addReview);
 
 export default router;

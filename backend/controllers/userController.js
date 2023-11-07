@@ -1,7 +1,15 @@
-import asyncHandler from 'express-async-handler';
-import UserModel from '../models/userModel.js';
-import generateToken from '../utils/generateToken.js';
-import sanitize from '../utils/sanitize.js';
+import asyncHandler from "express-async-handler";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import path from "path";
+
+import UserModel from "../models/userModel.js";
+import generateToken from "../utils/generateToken.js";
+import sanitize from "../utils/sanitize.js";
+import emailValidate from "../utils/emailValidate.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // @desc Auth user and get token
 // @route POST /api/users/login
@@ -11,17 +19,23 @@ export const authUser = asyncHandler(async (req, res) => {
 
   const user = await UserModel.findOne({ email });
 
+  const dataReturn = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isShop: user.isShop,
+    avatarUrl: user.avatarUrl,
+    token: generateToken(user.id),
+  };
+  if (user.isShop) {
+    dataReturn.paypalEmail = user.paypalEmail;
+  }
+
   if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user.id),
-    });
+    res.json(dataReturn);
   } else {
     res.status(401);
-    throw new Error('Invalid password or email');
+    throw new Error("Invalid password or email");
   }
 });
 
@@ -29,24 +43,26 @@ export const authUser = asyncHandler(async (req, res) => {
 // @route PATCH /api/users/profile
 // @access Private
 export const updateUserProfile = asyncHandler(async (req, res) => {
-  const user = await UserModel.findById(sanitize(req.body._id));
+  const user = await UserModel.findById(sanitize(req.user._id));
   if (user) {
     user.name = sanitize(req.body.name) || user.name;
     user.email = sanitize(req.body.email) || user.email;
     if (req.body.password) {
       user.password = sanitize(req.body.password);
     }
+    user.paypalEmail = sanitize(req.body.paypalEmail) || user.paypalEmail;
     const updatedUser = await user.save();
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
+      paypalEmail: updatedUser.paypalEmail,
+      isShop: updatedUser.isShop,
       token: generateToken(updatedUser._id),
     });
   } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 });
 
@@ -54,17 +70,69 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
 // @route POST /api/users
 // @access Public
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, paypalEmail, isShop } = req.body;
+  let avatarUrl = req.body.avatarUrl;
+
+  if (!name) {
+    res.status(400);
+    throw new Error("Name is required");
+  }
+
+  if (!password) {
+    res.status(400);
+    throw new Error("Password is required");
+  }
+
+  if (isShop) {
+    if (!paypalEmail) {
+      res.status(400);
+      throw new Error("Paypal Email is required for shop");
+    } else {
+      if (!emailValidate(paypalEmail)) {
+        res.status(400);
+        throw new Error("Paypal Email format is not right");
+      }
+    }
+  }
+
+  if (!email) {
+    res.status(400);
+    throw new Error("Email is required for shop");
+  } else {
+    if (!emailValidate(email)) {
+      res.status(400);
+      throw new Error("Email format is not right");
+    }
+  }
+
+  if (avatarUrl) {
+    try {
+      await fs.promises.access(
+        `${__dirname.replace("\\controllers", "")}${avatarUrl}`,
+        fs.constants.F_OK,
+        (err) => {}
+      );
+    } catch (error) {
+      res.status(400);
+      throw new Error("Avatar URL is not correct");
+    }
+  } else {
+    avatarUrl = "/uploads/defaultAvatar.png";
+  }
 
   const userExists = await UserModel.findOne({ email: sanitize(email) });
   if (userExists) {
     res.status(400);
-    throw new Error('User already registered');
+    throw new Error("User already registered");
   }
+
   const user = await UserModel.create({
     name: sanitize(name),
-    email: sanitize(email),
     password: sanitize(password),
+    email: sanitize(email),
+    paypalEmail: sanitize(paypalEmail),
+    isShop: sanitize(isShop),
+    avatarUrl: sanitize(avatarUrl),
   });
 
   if (user) {
@@ -72,11 +140,13 @@ export const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl,
+      isShop: user.isShop,
       token: generateToken(user.id),
     });
   } else {
     res.status(400);
-    throw new Error('Invalid user data');
+    throw new Error("Invalid user data");
   }
 });
 
@@ -90,17 +160,17 @@ export const getUsersAdmin = asyncHandler(async (req, res) => {
   if (!sId) {
     const count = await UserModel.countDocuments(sId);
     const users = await UserModel.find(sId)
-      .select('-password')
+      .select("-password")
       .limit(pageSize)
       .skip(pageSize * (page - 1));
     res.json({ users, page, pages: Math.ceil(count / pageSize) });
   } else {
-    const user = await UserModel.findById(sId).select('-password');
+    const user = await UserModel.findById(sId).select("-password");
     if (user) {
       res.json({ user });
     } else {
       res.status(404);
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
   }
 });

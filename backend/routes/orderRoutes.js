@@ -1,27 +1,27 @@
-import express from 'express';
+import express from "express";
 import {
   addOrderItems,
   getAllOrders,
   getOrderById,
   getOrderUserOrders,
-  putUpdateOrderPay,
   putUpdateOrderToDelivered,
-} from '../controllers/orderController.js';
-import { isAdmin, protect } from '../middleware/authMiddleware.js';
+  payoutForShop,
+} from "../controllers/orderController.js";
+import { isCustomer, isShop, protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router
-  .route('/')
-  .post(protect, addOrderItems)
-  .get(protect, isAdmin, getAllOrders);
+  .route("/")
+  .post(protect, isCustomer, addOrderItems)
+  .get(protect, isShop, getAllOrders);
 
-router.route('/myorders').get(protect, getOrderUserOrders);
+router.route("/myorders").get(protect, isCustomer, getOrderUserOrders);
 
-router.route('/:id/pay').put(protect, putUpdateOrderPay);
+router.route("/:orderId/payout").get(protect, isCustomer, payoutForShop);
 
-router.route('/:id/deliver').put(protect, isAdmin, putUpdateOrderToDelivered);
+router.route("/:id/deliver").put(protect, isShop, putUpdateOrderToDelivered);
 
-router.route('/:id').get(protect, getOrderById);
+router.route("/:id").get(protect, getOrderById);
 
 export default router;
