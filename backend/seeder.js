@@ -1,32 +1,43 @@
 import dotenv from "dotenv";
 import users from "./data/users.js";
 import products from "./data/products.js";
-import homeinformations from "./data/homeinformations.js";
 
-import HomeModel from "./models/homeModel.js";
 import UserModel from "./models/userModel.js";
 import ProductModel from "./models/productModel.js";
 import OrderModel from "./models/orderModel.js";
 import connectDB from "./config/db.js";
 
-dotenv.config({ path: "./backend/.env" });
+// dotenv.config({ path: "./backend/.env" });
+dotenv.config();
 
 connectDB();
 
 const importData = async () => {
   try {
-    await HomeModel.deleteMany();
     await OrderModel.deleteMany();
     await ProductModel.deleteMany();
     await UserModel.deleteMany();
 
-    const createdHomeInfo = await HomeModel.insertMany(homeinformations);
     const createdUsers = await UserModel.insertMany(users);
     const adminUser = createdUsers[0]._id;
-    const sampleProducts = products.map((item) => ({
-      ...item,
+    const sampleProducts = products.map((product) => ({
+      ...product,
       user: adminUser,
     }));
+
+    for (let product of sampleProducts) {
+      let ratingSum = 0;
+      let numReviews = 0;
+      let i = 2;
+      for (let review of product.reviews) {
+        ratingSum += Number(review.rating);
+        numReviews += 1;
+        review.user = createdUsers[i++]._id;
+      }
+      product.ratingSum = ratingSum;
+      product.numReviews = numReviews;
+      product.ratingAverage = ratingSum / numReviews;
+    }
 
     await ProductModel.insertMany(sampleProducts);
 
@@ -40,7 +51,6 @@ const importData = async () => {
 
 const purgeData = async () => {
   try {
-    await HomeModel.deleteMany();
     await OrderModel.deleteMany();
     await ProductModel.deleteMany();
     await UserModel.deleteMany();

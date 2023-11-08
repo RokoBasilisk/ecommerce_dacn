@@ -1,6 +1,22 @@
 import path from "path";
 import express from "express";
 import multer from "multer";
+
+/**
+ * @swagger
+ * tags:
+ *   name: Upload
+ *   description: API endpoints for the upload router
+ * /:
+ *   post:
+ *     summary: Post new image
+ *     responses:
+ *       200:
+ *         description: path for image
+ *         content:
+ *          type: string
+ *
+ */
 const router = express.Router();
 
 const storage = multer.diskStorage({
