@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Wrapper = styled.div`
   display: grid;
@@ -41,6 +41,8 @@ export const ReviewWrapper = styled.div`
   grid-template-columns: auto;
   grid-gap: 1rem;
   margin-top: 1rem;
+  overflow-y: auto;
+  height: 500px;
 `;
 export const ReviewCard = styled.div`
   background: white;

@@ -21,17 +21,16 @@ export function Register({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [paypalEmail, setPaypalEmail] = useState('');
   const [message, setMessage] = useState({});
   const redirect = location.search ? location.search.split('=')[1] : '/';
   const { error, loading } = userRegister;
-
   useEffect(() => {
     if (!loading && !error && userInfo) history.push(redirect);
   }, [history, userInfo, redirect, loading, error]);
 
   function submitHandler(e) {
-    setMessage('asd');
-    e.preventDefault();
+     e.preventDefault();
     if (
       name.length === 0 ||
       email.length === 0 ||
@@ -55,7 +54,7 @@ export function Register({
       });
       return;
     }
-    register(name, email, password);
+    register(name, email, password, paypalEmail);
   }
   return (
     <Row justifyCenter>
@@ -80,6 +79,15 @@ export function Register({
             isInvalid={!!message['email']}
             onChange={setEmail}
             autocomplete="email"
+          />
+          <FormInput
+            name="paypalEmail"
+            type="email"
+            value={paypalEmail}
+            label="Paypal Email"
+            isInvalid={!!message['paypalEmail']}
+            onChange={setPaypalEmail}
+            autocomplete="paypal-email"
           />
           <FormInput
             name="password"

@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import { Wrapper } from './ProductDisplay.style';
-import { Container } from '../../../styles/main.styles';
-import PictureDisplay from '../../atoms/PictureDisplay';
-import ProductData from '../ProductData';
+import { Wrapper } from "./ProductDisplay.style";
+import { Container } from "../../../styles/main.styles";
+import PictureDisplay from "../../atoms/PictureDisplay";
+import ProductData from "../ProductData";
 
 export default function ProductDisplay({ images, product, addToCart }) {
   return (

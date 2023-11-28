@@ -85,27 +85,6 @@ export default function StoreHeader({
           </NavHeader>
         </Container>
       </Header>
-      <SubHeader>
-        <ContHead>
-          <NavCol align="flex-start">
-            <CatSub>
-              <FaBars /> SHOP BY CATEGORY
-              <CatDropDown>
-                <Categories categories={categoriesList} />
-              </CatDropDown>
-            </CatSub>
-            {!categoriesList.loading &&
-              categoriesList.categoryList.map((el) => (
-                <CatLink key={el} href={'/category/' + el}>
-                  {el}
-                </CatLink>
-              ))}
-            <CatLink color="FF0000" href="#">
-              Sale
-            </CatLink>
-          </NavCol>
-        </ContHead>
-      </SubHeader>
     </>
   );
 }

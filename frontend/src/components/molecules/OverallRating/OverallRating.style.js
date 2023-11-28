@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 export const RatingFlex = styled.div`
   display: flex;
   flex-direction: column;
@@ -27,9 +27,7 @@ export const RatingFlex = styled.div`
 export const RatingsWrapper = styled.div`
   display: grid;
   gap: 1rem;
-  @media (min-width: 576px) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
+  grid-template-columns: 1fr 1fr;
 `;
 
 export const PageWrapper = styled.div`
@@ -70,18 +68,18 @@ export const Bar = styled.div`
   overflow: hidden;
 
   ::before {
-    content: '';
+    content: "";
     background: #fea569;
     position: absolute;
     height: 100%;
-    width: ${({ width }) => (width ? `${width}%` : '0%')};
+    width: ${({ width }) => (width ? `${width}%` : "0%")};
     top: 0;
     left: 0;
   }
   ::after {
     animation: ${fill} 1s ease forwards;
     animation-delay: ${({ delay }) => delay && `0.${delay}s`};
-    content: '';
+    content: "";
     background: #fff;
     position: absolute;
     height: 100%;

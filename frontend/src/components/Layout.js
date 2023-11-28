@@ -30,10 +30,10 @@ export const Layout = ({
         logout={logout}
         featuredItemPerCategory={featuredItemPerCategory}
       />
-      <Container>
+      {/* <Container> */}
         <main>{children}</main>
-      </Container>
-      <Footer />
+      {/* </Container> */}
+      {/* <Footer /> */}
     </>
   );
 };

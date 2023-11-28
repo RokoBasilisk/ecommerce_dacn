@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import cors from 'cors';
 
 import { basicInfo } from "./docs/basicInfo.js";
 import connectDB from "./config/db.js";
@@ -10,6 +11,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { isCustomer, protect } from "./middleware/authMiddleware.js";
 
@@ -18,6 +20,8 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 
@@ -33,6 +37,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/config/paypal", protect, isCustomer, (req, res) =>
   res.send(process.env.PAYPAL_CLIENT_ID)
 );

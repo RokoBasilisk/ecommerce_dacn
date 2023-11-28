@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Wrapper = styled.div`
   display: flex;
@@ -36,6 +36,14 @@ export const FlexRow = styled.div`
   margin-top: 2rem;
   display: flex;
   align-items: center;
+  gap: 1rem;
+`;
+
+export const FlexColumn = styled.div`
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 1rem;
 `;
 

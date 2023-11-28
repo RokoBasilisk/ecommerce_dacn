@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 import {
   FlexBetween,
@@ -12,77 +12,87 @@ import {
   CategoriesList,
   DataWrapper,
   CartButtonDisabled,
-} from './ProductData.style';
-import Quantity from '../../atoms/Quantity';
-import Rating from '../../atoms/Rating';
+  FlexColumn,
+} from "./ProductData.style";
+import Quantity from "../../atoms/Quantity";
+import Rating from "../../atoms/Rating";
+import { InputText, InputArea } from "../../atoms/FormInput/FormInput.style";
 
 export default function ProductData({
   showLinks = false,
-  addToCart,
+  updateProductHandler,
   showDesc = true,
   name,
-  price,
-  rating,
+  unitPrice,
+  ratingAverage,
   numReviews,
   description,
   countInStock,
   category,
   _id,
 }) {
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(0);
+
+  const [formData, setFormData] = useState({
+    name,
+    unitPrice,
+    description,
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
     <Wrapper>
-      {showLinks ? (
-        <Link to={'/product/' + _id}>
-          <ProductTitle>{name}</ProductTitle>
-        </Link>
-      ) : (
-        <ProductTitle>{name}</ProductTitle>
-      )}
+      <InputText
+        value={formData.name}
+        name="name"
+        onChange={handleInputChange}
+      />
+      <br />
       <FlexBetween>
-        <PriceTag>$ {price}</PriceTag>
-        <Rating rating={rating} count={numReviews} />
+        <PriceTag style={{ marginTop: "1.5rem" }}>$ </PriceTag>
+        <InputText
+          value={formData.unitPrice}
+          name="unitPrice"
+          onChange={handleInputChange}
+        />
+        <Rating rating={ratingAverage} count={numReviews} />
       </FlexBetween>
-      {showDesc && <ProductDesc>{description}</ProductDesc>}
-      {/* 
-      // This is commented out since it isn't implemented in the backend
-      <FlexRow>
-        Color:
-        <ColorDiv active color="blue" />
-        <ColorDiv color="red" />
-      </FlexRow> */}
-      {countInStock > 0 ? (
-        <FlexRow>
-          <Quantity qty={qty} setQty={setQty} numInStock={countInStock} />
-          <CartButton onClick={() => addToCart(_id, qty)}>
-            Add to Cart
-          </CartButton>
-        </FlexRow>
-      ) : (
-        <FlexRow>
-          <Quantity qty={0} numInStock={0} />
-          <CartButtonDisabled>Out of stock</CartButtonDisabled>
-        </FlexRow>
+      {showDesc && (
+        <InputArea
+          value={formData.description}
+          name="description"
+          onChange={handleInputChange}
+        />
       )}
+      <FlexColumn>
+        <Quantity qty={qty} setQty={setQty} numInStock={countInStock} />
+        <div>Current product in stocks: {countInStock}</div>
+        <CartButton
+          onClick={() => {
+            formData.countInStock = qty;
+            updateProductHandler(_id, formData);
+          }}
+        >
+          Update Product
+        </CartButton>
+      </FlexColumn>
       <DataWrapper>
         <CategoriesList>
-          {showLinks ? (
-            <Link to={'/product/' + _id}>
-              <span>SKU:</span>
-              <p>{_id}</p>
-            </Link>
-          ) : (
-            <>
-              <span>SKU:</span>
-              <p>{_id}</p>
-            </>
-          )}
+          <span>SKU:</span>
+          <p>{_id}</p>
         </CategoriesList>
-        <CategoriesList>
-          <span>Category:</span>
-          <Link to={'/category/' + category}>{category}</Link>
-        </CategoriesList>
+        {category &&
+          category.map((item) => {
+            return (
+              <CategoriesList>
+                <span>Category:</span>
+                <Link to={"/category/" + item}>{item}</Link>
+              </CategoriesList>
+            );
+          })}
       </DataWrapper>
     </Wrapper>
   );

@@ -1,14 +1,15 @@
-import React from 'react';
-import { BsStar, BsStarFill, BsStarHalf } from 'react-icons/bs';
+import React from "react";
+import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
 
-import { Wrapper } from './Rating.style';
+import { Wrapper } from "./Rating.style";
 
-export default function Rating({ rating, count, color = '#fea569' }) {
+export default function Rating({ rating, count, color = "#fea569" }) {
   function returnIcon(value, compare) {
-    if (value >= compare) return <BsStarFill key={value} color={color} />;
+    if (value >= compare)
+      return <BsStarFill key={value + compare} color={color} />;
     else if (Math.round(value) >= compare)
-      return <BsStarHalf key={value} color={color} />;
-    else return <BsStar key={value} color={color} />;
+      return <BsStarHalf key={value + compare} color={color} />;
+    else return <BsStar key={value + compare} color={color} />;
   }
 
   // Creates an empty array then loops through it rendering returnIcon

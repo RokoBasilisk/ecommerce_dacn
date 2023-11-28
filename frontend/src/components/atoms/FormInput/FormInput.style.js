@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const InputWrapper = styled.div`
   margin-bottom: 1rem;
@@ -7,6 +7,18 @@ export const InputWrapper = styled.div`
 export const InputLabel = styled.label`
   display: inline-block;
   margin-bottom: 0.5rem;
+`;
+
+export const InputArea = styled.textarea`
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  color: #55595c;
+  background-color: #f7f7f9;
+  background-clip: padding-box;
+  font-size: 0.875rem;
+  border: 0 solid #ced4da;
+  border-radius: 0;
 `;
 
 export const InputText = styled.input`
@@ -26,7 +38,7 @@ export const InputText = styled.input`
   ${({ isInvalid }) =>
     isInvalid
       ? `border-color: #d9534f; box-shadow: 0 0 0 0.2rem rgb(217 83 79 / 25%);`
-      : ''};
+      : ""};
   :focus {
     color: #55595c;
     background-color: #f7f7f9;

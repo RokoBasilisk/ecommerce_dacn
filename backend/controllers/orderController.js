@@ -5,6 +5,7 @@ import ProductModel from "../models/productModel.js";
 import sanitize from "../utils/sanitize.js";
 import Mongoose from "mongoose";
 import axios from "axios";
+import { FAIL_HTTP_STATUS, SUCCESS_HTTP_STATUS } from "../constanst/ResultResponse.js";
 
 const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 
@@ -17,7 +18,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
   let itemsPrice = 0;
 
   if (orderItems && Object.keys(orderItems).length === 0) {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("No items in this order");
   } else {
     for (let item of Object.keys(orderItems)) {
@@ -32,7 +33,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
           itemsPrice += res.unitPrice * quantity;
         })
         .catch((err) => {
-          res.status(404);
+          res.status(FAIL_HTTP_STATUS);
           throw new Error("Item in order not found, try again later");
         });
     }
@@ -54,7 +55,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
 
     const createdOrder = await order.save();
 
-    res.status(201).json({
+    res.status(SUCCESS_HTTP_STATUS).json({
       success: true,
       orderId: createdOrder._id,
       totalPrice: createdOrder.totalPrice,
@@ -70,7 +71,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
 
   if (!orderId) {
     return res
-      .status(401)
+      .status(FAIL_HTTP_STATUS)
       .json({ success: false, message: "orderId is not found" });
   }
 
@@ -89,7 +90,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
 
   if (order) {
     if (order.paymentResult) {
-      res.status(401);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Order already paid");
     }
   }
@@ -153,9 +154,11 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       order.isPaid = true;
       order.paidAt = date;
       order.save();
+      res.status(SUCCESS_HTTP_STATUS);
       return res.json({ success: true });
     })
     .catch((error) => {
+      res.status(FAIL_HTTP_STATUS)
       return res.json(error);
       // Handle errors
     });
@@ -166,7 +169,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
 // @access Private
 export const getOrderById = asyncHandler(async (req, res) => {
   if (!Mongoose.Types.ObjectId.isValid(sanitize(req.params.id))) {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
   }
   const order = await OrderModel.findById(sanitize(req.params.id)).populate(
@@ -175,9 +178,10 @@ export const getOrderById = asyncHandler(async (req, res) => {
   );
 
   if (order) {
+    res.status(SUCCESS_HTTP_STATUS);
     res.json(order);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
   }
 });
@@ -189,9 +193,10 @@ export const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await OrderModel.find({}).populate("user", "name email");
 
   if (orders) {
+    res.status(SUCCESS_HTTP_STATUS);
     res.json(orders);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
   }
 });
@@ -207,9 +212,10 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
     order.deliveredAt = Date.now();
 
     const updatedOrder = await order.save();
+    res.status(SUCCESS_HTTP_STATUS);
     res.json(updatedOrder);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
   }
 });
@@ -219,5 +225,6 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
 // @access Private
 export const getOrderUserOrders = asyncHandler(async (req, res) => {
   const order = await OrderModel.find({ user: req.user._id });
+  res.status(SUCCESS_HTTP_STATUS);
   res.json(order);
 });

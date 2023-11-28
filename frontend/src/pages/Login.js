@@ -14,7 +14,6 @@ export function Login({ location, login, history, userLogin }) {
   const [password, setPassword] = useState('');
   const redirect = location.search ? location.search.split('=')[1] : '';
   const { loading, error, userInfo } = userLogin;
-
   useEffect(() => {
     if (!loading && !error && userInfo) history.push(redirect);
   }, [error, history, loading, redirect, userInfo]);

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Container = styled.div`
   width: 100%;
@@ -36,7 +36,7 @@ export const Container = styled.div`
 `;
 
 export const HeaderText = styled.h1`
-  ${({ textAlign }) => (textAlign ? `text-align: ${textAlign};` : '')}
+  ${({ textAlign }) => (textAlign ? `text-align: ${textAlign};` : "")}
 
   text-transform: uppercase;
   letter-spacing: 3px;
@@ -49,7 +49,7 @@ export const HeaderText = styled.h1`
 `;
 
 export const SubheaderText = styled.h2`
-  ${({ textAlign }) => (textAlign ? `text-align: ${textAlign};` : '')}
+  ${({ textAlign }) => (textAlign ? `text-align: ${textAlign};` : "")}
   text-transform: uppercase;
   letter-spacing: 3px;
   font-size: 1.75rem;

@@ -28,11 +28,11 @@ import {
   PRODUCT_MODAL_SUCCESS,
   PRODUCT_MODAL_REQUEST,
   PRODUCT_MODAL_FAIL,
-} from '../types';
+} from "../types";
 
 export const productListReducer = (
   state = { products: [], pages: [], page: [] },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -59,6 +59,15 @@ export const productListReducer = (
       };
     case PRODUCT_DELETE_ADMIN_FAIL:
       return { ...state, loading: false, delError: payload };
+    case PRODUCT_UPDATE_ADMIN_SUCCESS:
+      var updateProducts = state.products.map((el) => {
+        if (el._id === payload._id) {
+          return payload;
+        } else {
+          return el;
+        }
+      });
+      return { ...state, products: updateProducts };
     default:
       return state;
   }
@@ -66,18 +75,20 @@ export const productListReducer = (
 
 export const productDetailsReducer = (
   state = { product: { reviews: [] }, isModalOn: false },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {
     case PRODUCT_CREATE_ADMIN_REQUEST:
     case PRODUCT_UPDATE_ADMIN_REQUEST:
+      return { ...state, loading: true };
     case PRODUCT_DETAILS_REQUEST:
       return { loading: true };
     case PRODUCT_MODAL_REQUEST:
       return { loading: true, isModalOn: false };
     case PRODUCT_CREATE_ADMIN_SUCCESS:
     case PRODUCT_UPDATE_ADMIN_SUCCESS:
+      return { loading: false, isModalOn: false, product: payload };
     case PRODUCT_CREATE_REVIEW_SUCCESS:
     case PRODUCT_DETAILS_SUCCESS:
       return { loading: false, product: payload, isModalOn: false };
@@ -85,6 +96,7 @@ export const productDetailsReducer = (
       return { loading: false, product: payload, isModalOn: true };
     case PRODUCT_CREATE_ADMIN_FAIL:
     case PRODUCT_UPDATE_ADMIN_FAIL:
+      return { loading: false, error: payload };
     case PRODUCT_DETAILS_FAIL:
       return { loading: false, error: payload };
     case PRODUCT_MODAL_FAIL:
@@ -116,7 +128,7 @@ export const productReviewCreateReducer = (state = {}, action) => {
 
 export const productTopRatedReducer = (
   state = { loading: true, products: [] },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -134,7 +146,7 @@ export const productTopRatedReducer = (
 
 export const productFeaturedReducer = (
   state = { loading: true, products: [] },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {

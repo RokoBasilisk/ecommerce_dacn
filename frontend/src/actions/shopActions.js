@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   SHOP_CATEGORIES_REQUEST,
   SHOP_CATEGORIES_SUCCESS,
@@ -15,14 +15,15 @@ import {
   SHOP_FEATURED_CATEGORY_PRODUCTS_REQUEST,
   SHOP_FEATURED_CATEGORY_PRODUCTS_SUCCESS,
   SHOP_FEATURED_CATEGORY_PRODUCTS_FAIL,
-} from '../types';
+  prefixAPI,
+} from "../types";
 
 export const listCategoriesNames = () => async (dispatch) => {
   try {
     dispatch({
       type: SHOP_CATEGORIES_REQUEST,
     });
-    const { data } = await axios.get(`/api/products/category/name`);
+    const { data } = await axios.get(`${prefixAPI}/api/products/category/name`);
     dispatch({
       type: SHOP_CATEGORIES_SUCCESS,
       payload: data,
@@ -39,14 +40,14 @@ export const listCategoriesNames = () => async (dispatch) => {
 };
 
 export const listFeaturedCategoryItems = (selectedCategory) => async (
-  dispatch,
+  dispatch
 ) => {
   try {
     dispatch({
       type: SHOP_FEATURED_CATEGORY_PRODUCTS_REQUEST,
     });
     const { data } = await axios.get(
-      `/api/products/featured/${selectedCategory}?pageSize=6`,
+      `${prefixAPI}/api/products/featured/${selectedCategory}?pageSize=6`
     );
     dispatch({
       type: SHOP_FEATURED_CATEGORY_PRODUCTS_SUCCESS,
@@ -68,7 +69,7 @@ export const listFeaturedCategory = () => async (dispatch) => {
     dispatch({
       type: SHOP_FEATURED_CATEGORY_REQUEST,
     });
-    const { data } = await axios.get(`/api/homepage/featCategory`);
+    const { data } = await axios.get(`${prefixAPI}/api/homepage/featCategory`);
     dispatch({
       type: SHOP_FEATURED_CATEGORY_SUCCESS,
       payload: data,
@@ -89,7 +90,7 @@ export const listFeaturedMessage = () => async (dispatch) => {
     dispatch({
       type: SHOP_FEATURED_MESSAGE_REQUEST,
     });
-    const { data } = await axios.get(`/api/homepage/message`);
+    const { data } = await axios.get(`${prefixAPI}/api/homepage/message`);
     dispatch({
       type: SHOP_FEATURED_MESSAGE_SUCCESS,
       payload: data,

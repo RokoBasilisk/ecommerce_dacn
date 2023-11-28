@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 import {
   ImgDisplay,
   ImgThumb,
   PageWrapper,
   ThumbWrapper,
-} from './pictureDisplay.style';
+} from "./pictureDisplay.style";
 
-export default function PictureDisplay({ images }) {
+export default function PictureDisplay({ image }) {
   const [state, setState] = useState(0);
   const [mouseX, setMouseX] = useState(null);
 
   const changeImage = (param) => {
-    if (param === 'prev') {
+    if (param === "prev") {
       if (state - 1 >= 0) {
         setState(state - 1);
       } else {
-        setState(images.length - 1);
+        setState(2);
       }
     } else {
-      if (state + 1 < images.length) {
+      if (state + 1 < 3) {
         setState(state + 1);
       } else {
         setState(0);
@@ -30,28 +30,32 @@ export default function PictureDisplay({ images }) {
   const mouseDown = (e) => {
     if (mouseX && e.clientX !== mouseX) {
       if (e.clientX > mouseX) {
-        changeImage('prev');
+        changeImage("prev");
       } else {
-        changeImage('next');
+        changeImage("next");
       }
     }
   };
+
+  const renderImage = (e) => {
+    const results = [];
+    for (let i = 0; i < 3; i++) {
+      results.push(
+        <ImgThumb active={state === i} key={i} onMouseEnter={() => setState(i)}>
+          <img src={image} alt="" draggable="false" />
+        </ImgThumb>
+      );
+    }
+    return results;
+  };
   return (
     <PageWrapper>
-      <ThumbWrapper>
-        {images.map((img, index) => (
-          <ImgThumb
-            active={state === index}
-            key={index}
-            onMouseEnter={() => setState(index)}>
-            <img src={img} alt="" draggable="false" />
-          </ImgThumb>
-        ))}
-      </ThumbWrapper>
+      <ThumbWrapper>{renderImage()}</ThumbWrapper>
       <ImgDisplay
         onMouseDown={(e) => setMouseX(e.clientX)}
-        onMouseUp={(e) => mouseDown(e)}>
-        <img src={images[state]} alt="" draggable="false" />
+        onMouseUp={(e) => mouseDown(e)}
+      >
+        <img src={image} alt="" draggable="false" />
       </ImgDisplay>
     </PageWrapper>
   );

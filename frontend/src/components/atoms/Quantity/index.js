@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 import {
   BtnWrapper,
@@ -7,46 +7,29 @@ import {
   PlusButton,
   QtyInput,
   Wrapper,
-} from './quantity.style';
+} from "./quantity.style";
 
 export default function Quantity({ qty, setQty, numInStock }) {
-  const [warn, setWarn] = useState(false);
-
   const changeQty = (action) => {
-    if (action === 'add') {
-      if (qty + 1 <= numInStock) {
-        setQty((prevVal) => prevVal + 1);
-      } else {
-        setWarn(true);
-      }
+    if (action === "add") {
+      setQty((prevVal) => prevVal + 1);
     } else {
-      if (qty - 1 > 0) setQty((prevVal) => prevVal - 1);
-      else {
-        setWarn(true);
-      }
+      setQty((prevVal) => prevVal - 1);
     }
   };
 
-  // This is used to allow "blink" animation to happen
-  useEffect(() => {
-    if (warn)
-      setTimeout(() => {
-        setWarn(false);
-      }, 1000);
-  }, [warn]);
-
   return (
-    <Wrapper warn={warn}>
+    <Wrapper>
       <QtyInput
-        warn={warn}
         max={numInStock}
         value={qty}
-        onChange={() => setQty(qty)}></QtyInput>
+        onChange={() => setQty(qty)}
+      ></QtyInput>
       <BtnWrapper>
-        <MinusButton warn={warn} onClick={() => changeQty('rem')}>
+        <MinusButton onClick={() => changeQty("rem")}>
           <FaMinus />
         </MinusButton>
-        <PlusButton warn={warn} onClick={() => changeQty('add')}>
+        <PlusButton onClick={() => changeQty("add")}>
           <FaPlus />
         </PlusButton>
       </BtnWrapper>

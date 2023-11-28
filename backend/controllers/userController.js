@@ -7,6 +7,10 @@ import UserModel from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
 import sanitize from "../utils/sanitize.js";
 import emailValidate from "../utils/emailValidate.js";
+import {
+  FAIL_HTTP_STATUS,
+  SUCCESS_HTTP_STATUS,
+} from "../constanst/ResultResponse.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,23 +22,28 @@ export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("User not found");
+  }
 
   const dataReturn = {
     _id: user._id,
     name: user.name,
     email: user.email,
-    isShop: user.isShop,
     avatarUrl: user.avatarUrl,
     token: generateToken(user.id),
   };
   if (user.isShop) {
     dataReturn.paypalEmail = user.paypalEmail;
+    dataReturn.isShop = user.isShop;
   }
 
   if (user && (await user.matchPassword(password))) {
+    res.status(SUCCESS_HTTP_STATUS);
     res.json(dataReturn);
   } else {
-    res.status(401);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Invalid password or email");
   }
 });
@@ -52,7 +61,8 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     }
     user.paypalEmail = sanitize(req.body.paypalEmail) || user.paypalEmail;
     const updatedUser = await user.save();
-    res.json({
+    res.status(SUCCESS_HTTP_STATUS);
+    return res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
@@ -61,7 +71,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       token: generateToken(updatedUser._id),
     });
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("User not found");
   }
 });
@@ -74,33 +84,33 @@ export const registerUser = asyncHandler(async (req, res) => {
   let avatarUrl = req.body.avatarUrl;
 
   if (!name) {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Name is required");
   }
 
   if (!password) {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Password is required");
   }
 
   if (isShop) {
     if (!paypalEmail) {
-      res.status(400);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Paypal Email is required for shop");
     } else {
       if (!emailValidate(paypalEmail)) {
-        res.status(400);
+        res.status(FAIL_HTTP_STATUS);
         throw new Error("Paypal Email format is not right");
       }
     }
   }
 
   if (!email) {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Email is required for shop");
   } else {
     if (!emailValidate(email)) {
-      res.status(400);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Email format is not right");
     }
   }
@@ -113,7 +123,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         (err) => {}
       );
     } catch (error) {
-      res.status(400);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Avatar URL is not correct");
     }
   } else {
@@ -122,7 +132,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   const userExists = await UserModel.findOne({ email: sanitize(email) });
   if (userExists) {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("User already registered");
   }
 
@@ -136,7 +146,8 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    res.status(201).json({
+    res.status(SUCCESS_HTTP_STATUS);
+    return res.json({
       _id: user.id,
       name: user.name,
       email: user.email,
@@ -145,7 +156,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       token: generateToken(user.id),
     });
   } else {
-    res.status(400);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Invalid user data");
   }
 });
@@ -163,13 +174,15 @@ export const getUsersAdmin = asyncHandler(async (req, res) => {
       .select("-password")
       .limit(pageSize)
       .skip(pageSize * (page - 1));
-    res.json({ users, page, pages: Math.ceil(count / pageSize) });
+    res.status(SUCCESS_HTTP_STATUS);
+    return res.json({ users, page, pages: Math.ceil(count / pageSize) });
   } else {
     const user = await UserModel.findById(sId).select("-password");
     if (user) {
-      res.json({ user });
+      res.status(SUCCESS_HTTP_STATUS);
+      return res.json({ user });
     } else {
-      res.status(404);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("User not found");
     }
   }

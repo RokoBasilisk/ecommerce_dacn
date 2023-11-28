@@ -19,8 +19,9 @@ import {
   USER_LIST_DETAILS_REQUEST,
   USER_LIST_DETAILS_SUCCESS,
   USER_LIST_DETAILS_FAIL,
-} from '../types';
-import axios from 'axios';
+  prefixAPI,
+} from "../types";
+import axios from "axios";
 
 export const login = (email, password) => async (dispatch) => {
   try {
@@ -30,19 +31,24 @@ export const login = (email, password) => async (dispatch) => {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     };
 
     const { data } = await axios.post(
-      '/api/users/login',
+      `${prefixAPI}/api/users/login`,
       { email, password },
-      config,
+      config
     );
-
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+    if (!data.isShop) {
+      return dispatch({
+        type: USER_LOGIN_FAIL,
+        payload: "Not Authorized",
+      });
+    }
 
-    localStorage.setItem('userInfo', JSON.stringify(data));
+    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -58,10 +64,12 @@ export const logout = () => async (dispatch) => {
   dispatch({
     type: USER_LOGOUT,
   });
-  localStorage.removeItem('userInfo');
+  localStorage.removeItem("userInfo");
 };
 
-export const register = (name, email, password) => async (dispatch) => {
+export const register = (name, email, password, paypalEmail) => async (
+  dispatch
+) => {
   try {
     dispatch({
       type: USER_REGISTER_REQUEST,
@@ -69,20 +77,20 @@ export const register = (name, email, password) => async (dispatch) => {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     };
 
     const { data } = await axios.post(
-      '/api/users',
-      { name, email, password },
-      config,
+      `${prefixAPI}/api/users`,
+      { name, email, password, paypalEmail, isShop: true },
+      config
     );
 
     dispatch({ type: USER_REGISTER_SUCCESS });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
 
-    localStorage.setItem('userInfo', JSON.stringify(data));
+    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_REGISTER_FAIL,
@@ -101,13 +109,17 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     });
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${getState().userLogin.userInfo.token}`,
       },
     };
-    const { data } = await axios.patch('/api/users/profile', user, config);
+    const { data } = await axios.patch(
+      `${prefixAPI}/api/users/profile`,
+      user,
+      config
+    );
     dispatch({ type: USER_UPDATE_PROFILE_SUCCESS, payload: data });
-    localStorage.setItem('userInfo', JSON.stringify(data));
+    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_UPDATE_PROFILE_FAIL,

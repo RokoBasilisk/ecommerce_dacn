@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   CardTitle,
@@ -12,45 +12,31 @@ import {
   Text,
   Title,
   Wrapper,
-} from './ProductContent.style';
-import { Container } from '../../../styles/main.styles';
-import Rating from '../../atoms/Rating';
-import OverallRating from '../OverallRating';
+} from "./ProductContent.style";
+import { Container } from "../../../styles/main.styles";
+import Rating from "../../atoms/Rating";
+import OverallRating from "../OverallRating";
 
-export default function ProductContent({
-  isUserLogged,
-  product,
-  reviewCreate,
-}) {
+export default function ProductContent({ isUserLogged, product }) {
   return (
     <Container>
       <Wrapper>
         <Title>
-          <span>Description</span>
-        </Title>
-        <Text>{product.description}</Text>
-      </Wrapper>
-      <Wrapper>
-        <Title>
           <span>User reviews</span>
         </Title>
-        <OverallRating
-          reviewCreate={reviewCreate}
-          isUserLogged={isUserLogged}
-          product={product}
-        />
+        <OverallRating product={product} />
         <ReviewWrapper>
           {product.reviews.map((review) => {
             var d = new Date(review.createdAt);
             return (
-              <ReviewCard key={review.title}>
+              <ReviewCard key={review.user.email}>
                 <CardTitle>
-                  <span>{review.name}</span>
+                  <span>{review.user.email}</span>
                   <ReviewTime>
-                    {d.toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
+                    {d.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </ReviewTime>
                 </CardTitle>
@@ -58,7 +44,7 @@ export default function ProductContent({
                   <RatingWrapper>
                     <Rating rating={review.rating} align="flex-start" />
                   </RatingWrapper>
-                  <ReviewTitle>{review.title}</ReviewTitle>
+                  <ReviewTitle>{review.user.name}</ReviewTitle>
                 </RatingTitle>
                 <ReviewContent>{review.comment}</ReviewContent>
               </ReviewCard>

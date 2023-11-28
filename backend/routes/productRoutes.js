@@ -8,6 +8,7 @@ import {
   getProductByCategory,
   getProductById,
   getProducts,
+  getProductsByShop,
   getTopProducts,
   updateProductAdmin,
 } from "../controllers/productController.js";
@@ -18,6 +19,8 @@ const router = express.Router();
 router.route("/").get(getProducts);
 
 router.route("/").post(protect, isShop, createProductAdmin);
+
+router.route("/shop").get(protect, isShop, getProductsByShop);
 
 router.route("/featured/:category?").get(getFeaturedProducts);
 

@@ -29,10 +29,10 @@ export function Home({
 }) {
   // Used as a "ComponentDidMount"
   useEffect(() => {
-    listFeaturedMessage();
-    listFeaturedCategory();
-    listFeaturedProducts();
-    listTopProducts();
+    // listFeaturedMessage();
+    // listFeaturedCategory();
+    // listFeaturedProducts();
+    // listTopProducts();
     listProducts('', 1);
   }, []); // eslint-disable-line
   return (

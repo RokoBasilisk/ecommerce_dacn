@@ -6,6 +6,10 @@ import path from "path";
 import ProductModel from "../models/productModel.js";
 import sanitize from "../utils/sanitize.js";
 import Mongoose from "mongoose";
+import {
+  FAIL_HTTP_STATUS,
+  SUCCESS_HTTP_STATUS,
+} from "../constanst/ResultResponse.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +40,31 @@ export const getProducts = asyncHandler(async (req, res) => {
     })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
-  res.json({ products, page, pages: Math.ceil(count / pageSize) });
+  res.status(SUCCESS_HTTP_STATUS);
+  return res.json({ products, page, pages: Math.ceil(count / pageSize) });
+});
+
+export const getProductsByShop = asyncHandler(async (req, res) => {
+  const pageSize = 8;
+  const page = Number(req.query.pageNumber);
+
+  const keyword = req.query.keyword
+    ? {
+        name: {
+          // $regex is there so the user doesn't have to search exact product name
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+        user: req.user._id,
+        isDeleted: false,
+      }
+    : { user: req.user._id, isDeleted: false };
+  const count = await ProductModel.countDocuments({ ...keyword });
+  const products = await ProductModel.find({ ...keyword })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+
+  return res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc Fetch a single product
@@ -44,18 +72,21 @@ export const getProducts = asyncHandler(async (req, res) => {
 // @access Public
 export const getProductById = asyncHandler(async (req, res) => {
   if (!Mongoose.Types.ObjectId.isValid(sanitize(req.params.id))) {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Bad ObjectId");
   }
   const product = await ProductModel.find({
     _id: sanitize(req.params.id),
     isDeleted: false,
-  });
+  })
+    .populate("reviews.user")
+    .select("-password");
 
   if (product) {
-    res.json(product);
+    res.status(SUCCESS_HTTP_STATUS);
+    res.json(product[0]);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Product not found");
   }
 });
@@ -66,6 +97,7 @@ export const getProductById = asyncHandler(async (req, res) => {
 export const getCategoryNames = asyncHandler(async (req, res) => {
   const categoryNames = await ProductModel.distinct("category");
   if (categoryNames.length > 0) {
+    res.status(SUCCESS_HTTP_STATUS);
     res.json(categoryNames);
   } else {
     res.json([]);
@@ -90,9 +122,10 @@ export const getProductByCategory = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1));
 
   if (category.length > 0) {
+    res.status(SUCCESS_HTTP_STATUS);
     res.json({ page, pages: Math.ceil(count / pageSize), products: category });
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Category is empty");
   }
 });
@@ -105,19 +138,20 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
 
   if (object) {
     if (object.user.toString() !== req.user._id.toString()) {
-      res.status(403);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Not Authorized");
     }
 
     if (object.isDeleted) {
-      res.status(404);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Product not found");
     }
     object.isDeleted = true;
     await object.save();
-    res.status(200).json({ message: "Product removed" });
+    res.status(SUCCESS_HTTP_STATUS);
+    res.json({ message: "Product removed" });
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Object not found");
   }
 });
@@ -138,7 +172,7 @@ export const createProductAdmin = asyncHandler(async (req, res) => {
         }
       );
     } catch (error) {
-      res.status(400);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Image URL is not correct");
     }
   } else {
@@ -160,6 +194,7 @@ export const createProductAdmin = asyncHandler(async (req, res) => {
     isDeleted: false,
   });
   const createdObj = await object.save();
+  res.status(SUCCESS_HTTP_STATUS);
   res.json(createdObj);
 });
 
@@ -171,16 +206,16 @@ export const updateProductAdmin = asyncHandler(async (req, res) => {
   if (object) {
     object.image = sanitize(req.body.image) || object.image;
     object.name = sanitize(req.body.name) || object.name;
-    object.category = sanitize(req.body.category);
+    object.category = sanitize(req.body.category) || object.category;
     object.description = sanitize(req.body.description) || object.description;
     object.unitPrice = sanitize(req.body.unitPrice) || object.unitPrice;
-    object.countInStock =
-      sanitize(req.body.countInStock) || object.countInStock;
+    object.countInStock += sanitize(req.body.countInStock);
 
     const updatedObj = await object.save();
-    res.status(201).json(updatedObj);
+    res.status(SUCCESS_HTTP_STATUS);
+    res.json(updatedObj);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("User not found");
   }
 });
@@ -192,14 +227,14 @@ export const addReview = asyncHandler(async (req, res) => {
   const object = await ProductModel.findById(sanitize(req.params.id));
   if (object) {
     if (object.isDeleted) {
-      res.status(404);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Product not found");
     }
     const alrRev = object.reviews.find(
       (rev) => rev.user.toString() === req.user._id.toString()
     );
     if (alrRev) {
-      res.status(400);
+      res.status(FAIL_HTTP_STATUS);
       throw new Error("Already reviewed");
     }
 
@@ -214,9 +249,10 @@ export const addReview = asyncHandler(async (req, res) => {
     object.ratingAverage = object.ratingSum / object.numReviews;
 
     const updatedObj = await object.save();
-    res.status(201).json(updatedObj);
+    res.status(SUCCESS_HTTP_STATUS);
+    res.json(updatedObj);
   } else {
-    res.status(404);
+    res.status(FAIL_HTTP_STATUS);
     throw new Error("Product not found");
   }
 });
@@ -236,7 +272,8 @@ export const getTopProducts = asyncHandler(async (req, res) => {
   const products = await ProductModel.find(queryParams)
     .sort({ ratingAverage: -1 })
     .limit(limitSize);
-  res.json(products);
+  res.status(SUCCESS_HTTP_STATUS);
+  return res.json(products);
 });
 
 // @desc Get featured products
@@ -253,5 +290,6 @@ export const getFeaturedProducts = asyncHandler(async (req, res) => {
   const products = await ProductModel.find(queryParams)
     .sort({ ratingAverage: -1 })
     .limit(limitSize);
-  res.json(products);
+  res.status(SUCCESS_HTTP_STATUS);
+  return res.json(products);
 });

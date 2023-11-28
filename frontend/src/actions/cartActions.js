@@ -10,10 +10,11 @@ import {
   CART_REM_ITEM,
   CART_SAVE_SHIPPING_ADDRESS,
   CART_SAVE_PAYMENT_METHOD,
+  prefixAPI,
 } from '../types';
 
 export const addToCart = (id, qty = 1) => async (dispatch, getState) => {
-  const { data } = await axios.get(`/api/products/${id}`);
+  const { data } = await axios.get(`${prefixAPI}/api/products/${id}`);
   if (data.message || data.countInStock <= 0) {
     dispatch({
       type: CART_ADD_FAIL,
@@ -33,7 +34,7 @@ export const addToCart = (id, qty = 1) => async (dispatch, getState) => {
 };
 
 export const changeQtyCart = (id, qty = 1) => async (dispatch, getState) => {
-  const { data } = await axios.get(`/api/products/${id}`);
+  const { data } = await axios.get(`${prefixAPI}/api/products/${id}`);
 
   if (data.message || qty > data.countInStock) {
     dispatch({
@@ -71,7 +72,7 @@ export const listProductCart = (pId) => async (dispatch, getState) => {
       payload: pId,
     });
 
-    const { data } = await axios.get('/api/products/' + pId);
+    const { data } = await axios.get('${prefixAPI}/api/products/' + pId);
     dispatch({
       type: CART_LIST_SUCCESS,
       payload: data,

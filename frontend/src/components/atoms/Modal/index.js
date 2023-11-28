@@ -3,8 +3,10 @@ import ReactDom from "react-dom";
 import { connect } from "react-redux";
 import { useHistory } from "react-router";
 
-import { clearProductDetails } from "../../../actions/productActions";
-import { addToCart } from "../../../actions/cartActions";
+import {
+  clearProductDetails,
+  updateProduct,
+} from "../../../actions/productActions";
 
 import {
   ModalContainer,
@@ -12,13 +14,18 @@ import {
   ModalStyle,
   ModalContent,
   ModalBody,
-} from "./Modal.style";
+} from "../../organisms/Modal/Modal.style";
 
-import PictureDisplay from "../../atoms/PictureDisplay";
+import PictureDisplay from "../PictureDisplay";
 import ProductData from "../../molecules/ProductData";
 import Prefetch from "../../molecules/Prefetch";
+import ProductContent from "../../molecules/ProductContent";
 
-export function Modal({ productDetails, clearProductDetails, addToCart }) {
+export function QuantityModal({
+  productDetails,
+  clearProductDetails,
+  updateProduct,
+}) {
   const { error, loading, product, isModalOn } = productDetails || {
     error: false,
     loading: true,
@@ -26,15 +33,8 @@ export function Modal({ productDetails, clearProductDetails, addToCart }) {
     isModalOn: false,
   };
 
-  let history = useHistory();
-  function addToCartHandler(pId, qty = 1) {
-    if (product && qty <= product.countInStock) {
-      clearProductDetails();
-      addToCart(pId, qty);
-      history.push("/cart");
-    } else {
-      history.push("/404");
-    }
+  function updateProductHandler(pId, formData) {
+    updateProduct(pId, formData);
   }
 
   if (!isModalOn) return null;
@@ -46,11 +46,12 @@ export function Modal({ productDetails, clearProductDetails, addToCart }) {
           <ModalContainer>
             <ModalContent onClick={(e) => e.stopPropagation()}>
               <Wrapper>
-                <PictureDisplay images={Array(3).fill(product.image)} />
+                {/* <PictureDisplay images={Array(3).fill(product.image)} /> */}
+                <ProductContent product={product} />
                 <ProductData
                   showLinks
                   {...product}
-                  addToCart={addToCartHandler}
+                  updateProductHandler={updateProductHandler}
                 />
               </Wrapper>
             </ModalContent>
@@ -68,7 +69,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   clearProductDetails,
-  addToCart,
+  updateProduct,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Modal);
+export default connect(mapStateToProps, mapDispatchToProps)(QuantityModal);
