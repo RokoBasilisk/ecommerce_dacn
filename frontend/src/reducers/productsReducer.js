@@ -28,6 +28,9 @@ import {
   PRODUCT_MODAL_SUCCESS,
   PRODUCT_MODAL_REQUEST,
   PRODUCT_MODAL_FAIL,
+  PRODUCT_UPLOAD_IMAGE_REQUEST,
+  PRODUCT_UPLOAD_IMAGE_SUCCESS,
+  PRODUCT_UPLOAD_IMAGE_FAIL,
 } from "../types";
 
 export const productListReducer = (
@@ -79,14 +82,12 @@ export const productDetailsReducer = (
 ) => {
   const { type, payload } = action;
   switch (type) {
-    case PRODUCT_CREATE_ADMIN_REQUEST:
     case PRODUCT_UPDATE_ADMIN_REQUEST:
       return { ...state, loading: true };
     case PRODUCT_DETAILS_REQUEST:
       return { loading: true };
     case PRODUCT_MODAL_REQUEST:
       return { loading: true, isModalOn: false };
-    case PRODUCT_CREATE_ADMIN_SUCCESS:
     case PRODUCT_UPDATE_ADMIN_SUCCESS:
       return { loading: false, isModalOn: false, product: payload };
     case PRODUCT_CREATE_REVIEW_SUCCESS:
@@ -94,7 +95,6 @@ export const productDetailsReducer = (
       return { loading: false, product: payload, isModalOn: false };
     case PRODUCT_MODAL_SUCCESS:
       return { loading: false, product: payload, isModalOn: true };
-    case PRODUCT_CREATE_ADMIN_FAIL:
     case PRODUCT_UPDATE_ADMIN_FAIL:
       return { loading: false, error: payload };
     case PRODUCT_DETAILS_FAIL:
@@ -157,6 +157,71 @@ export const productFeaturedReducer = (
     case PRODUCT_FEATURED_FAIL:
       return { loading: false, error: payload };
 
+    default:
+      return state;
+  }
+};
+
+export const productImageReducer = (
+  state = {
+    loading: false,
+    image: null,
+    error: null,
+  },
+  action
+) => {
+  const { type, payload } = action;
+  switch (type) {
+    case PRODUCT_UPLOAD_IMAGE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case PRODUCT_UPLOAD_IMAGE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        image: payload,
+      };
+    case PRODUCT_UPLOAD_IMAGE_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: payload,
+      };
+    default:
+      return state;
+  }
+};
+
+export const productCreateReducer = (
+  state = {
+    loading: false,
+    image: null,
+    error: null,
+  },
+  action
+) => {
+  const { type, payload } = action;
+  switch (type) {
+    case PRODUCT_CREATE_ADMIN_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case PRODUCT_CREATE_ADMIN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+      };
+    case PRODUCT_CREATE_ADMIN_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: payload,
+      };
     default:
       return state;
   }

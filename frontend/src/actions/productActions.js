@@ -30,6 +30,9 @@ import {
   PRODUCT_MODAL_SUCCESS,
   PRODUCT_MODAL_FAIL,
   prefixAPI,
+  PRODUCT_UPLOAD_IMAGE_REQUEST,
+  PRODUCT_UPLOAD_IMAGE_SUCCESS,
+  PRODUCT_UPLOAD_IMAGE_FAIL,
 } from "../types";
 
 export const listProducts = (keyword = "", pageNumber = "") => async (
@@ -57,6 +60,68 @@ export const listProducts = (keyword = "", pageNumber = "") => async (
   } catch (error) {
     dispatch({
       type: PRODUCT_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const uploadImage = (file) => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_UPLOAD_IMAGE_REQUEST });
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    const { data } = await axios.post(
+      `${prefixAPI}/api/upload`,
+      formData,
+      config
+    );
+
+    dispatch({
+      type: PRODUCT_UPLOAD_IMAGE_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_UPLOAD_IMAGE_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+  }
+};
+
+export const createProduct = (formData) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: PRODUCT_CREATE_ADMIN_REQUEST,
+    });
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getState().userLogin.userInfo.token}`,
+      },
+    };
+    const { data } = await axios.post(
+      `${prefixAPI}/api/products/`,
+      formData,
+      config
+    );
+    dispatch({
+      type: PRODUCT_CREATE_ADMIN_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_CREATE_ADMIN_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

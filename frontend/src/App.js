@@ -50,9 +50,9 @@ function App() {
           <Route path="/search/:keyword" exact component={Search} /> */}
           <Protect>
             <HomeV2>
-              <Route path="/product/:id" component={Product} />
+              <Route path="/products" exact component={Products} />
+              <Route path="/products/new" exact component={Product} />
               <Route path="/" exact component={DashBoard} />
-              <Route path="/products" component={Products} />
             </HomeV2>
           </Protect>
           {/* <Route path="/404" exact component={MissingPage} />

@@ -96,13 +96,9 @@ export function Products({
                     </button>
                   </div>
                   <div className="input-group-append">
-                    <button
-                      className="btn btn-default"
-                      data-toggle="modal"
-                      data-target="#modal-xl"
-                    >
+                    <Link to={"/products/new"} className="btn btn-default">
                       <i className="fas fa-plus"></i>
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -112,7 +108,7 @@ export function Products({
               <table className="table table-hover text-nowrap">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>SKU</th>
                     <th>Product Name</th>
                     <th>Unit Price</th>
                     <th>Count In Stock</th>
@@ -137,9 +133,7 @@ export function Products({
                       ) => {
                         return (
                           <tr key={_id + name}>
-                            <td>
-                              <Link to={"/product/" + _id}>{_id}</Link>
-                            </td>
+                            <td>{_id}</td>
                             <td>{name}</td>
                             <td>${unitPrice}</td>
                             <td>{countInStock}</td>

@@ -27,6 +27,7 @@ export default function ProductContent({ isUserLogged, product }) {
         <OverallRating product={product} />
         <ReviewWrapper>
           {product.reviews.map((review) => {
+            console.log(review);
             var d = new Date(review.createdAt);
             return (
               <ReviewCard key={review.user.email}>

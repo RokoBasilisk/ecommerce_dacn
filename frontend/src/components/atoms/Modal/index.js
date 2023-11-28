@@ -14,7 +14,7 @@ import {
   ModalStyle,
   ModalContent,
   ModalBody,
-} from "../../organisms/Modal/Modal.style";
+} from "./Modal.style";
 
 import PictureDisplay from "../PictureDisplay";
 import ProductData from "../../molecules/ProductData";
