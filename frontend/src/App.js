@@ -55,8 +55,8 @@ function App() {
               <Route path="/" exact component={DashBoard} />
             </HomeV2>
           </Protect>
-          {/* <Route path="/404" exact component={MissingPage} />
-          <Route path="*" component={MissingPage} /> */}
+          <Route path="/404" exact component={MissingPage} />
+          <Route component={MissingPage} />
         </Switch>
       </Layout>
     </BrowserRouter>

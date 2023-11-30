@@ -3,7 +3,7 @@ import users from "./data/users.js";
 import products from "./data/products.js";
 
 import UserModel from "./models/userModel.js";
-import ProductModel from "./models/productModel.js";
+import ProductModel, { reviewSchema } from "./models/productModel.js";
 import OrderModel from "./models/orderModel.js";
 import connectDB from "./config/db.js";
 

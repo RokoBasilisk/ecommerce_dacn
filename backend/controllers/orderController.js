@@ -5,7 +5,10 @@ import ProductModel from "../models/productModel.js";
 import sanitize from "../utils/sanitize.js";
 import Mongoose from "mongoose";
 import axios from "axios";
-import { FAIL_HTTP_STATUS, SUCCESS_HTTP_STATUS } from "../constanst/ResultResponse.js";
+import {
+  FAIL_HTTP_STATUS,
+  SUCCESS_HTTP_STATUS,
+} from "../constanst/ResultResponse.js";
 
 const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 
@@ -158,7 +161,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       return res.json({ success: true });
     })
     .catch((error) => {
-      res.status(FAIL_HTTP_STATUS)
+      res.status(FAIL_HTTP_STATUS);
       return res.json(error);
       // Handle errors
     });
@@ -190,7 +193,76 @@ export const getOrderById = asyncHandler(async (req, res) => {
 // @route GET /api/orders/:id
 // @access Private
 export const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await OrderModel.find({}).populate("user", "name email");
+  // get all product is created by shop and exist in order
+  const productsByShop = await ProductModel.aggregate([
+    {
+      $match: {
+        user: Mongoose.Types.ObjectId(req.user._id), // Match documents where the user matches req.user._id
+        isDeleted: false,
+      },
+    },
+    {
+      $lookup: {
+        from: "orders", // Assuming the collection name for orders is "orders"
+        localField: "_id",
+        foreignField: "orderItems.productId",
+        as: "matchedOrders", // Create a field to hold matched orders
+      },
+    },
+    {
+      $match: {
+        matchedOrders: { $ne: [] }, // Filter documents where there are matched orders
+      },
+    },
+    {
+      $project: {
+        _id: 1, // Project only the _id field
+      },
+    },
+  ]);
+
+  // Get all order that exist product is created by shop
+  const orders = await OrderModel.aggregate([
+    {
+      $match: {
+        "orderItems.productId": { $in: productsByShop.map((e) => e._id) }, // Match orders with product IDs in the provided array
+      },
+    },
+    {
+      $unwind: "$orderItems", // Unwind the orderItems array
+    },
+    {
+      $match: {
+        "orderItems.productId": { $in: productsByShop.map((e) => e._id) }, // Match orderItems with product IDs in the provided array
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        orderItems: { $push: "$orderItems" },
+        taxPrice: { $first: "$taxPrice" },
+        shippingPrice: { $first: "$shippingPrice" },
+        totalPrice: { $first: "$totalPrice" },
+        isPaid: { $first: "$isPaid" },
+        isDelivered: { $first: "$isDelivered" },
+        shippingAddress: { $first: "$shippingAddress" },
+        paymentMethod: { $first: "$paymentMethod" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+      },
+    },
+  ]);
+
+  // populate orderItems.productId
+  for (let order of orders) {
+    for (let orderItem of order.orderItems) {
+      orderItem.product = await ProductModel.findById(
+        orderItem.productId
+      ).select(["_id", "name", "image"]);
+      delete orderItem.productId;
+      delete orderItem._id;
+    }
+  }
 
   if (orders) {
     res.status(SUCCESS_HTTP_STATUS);

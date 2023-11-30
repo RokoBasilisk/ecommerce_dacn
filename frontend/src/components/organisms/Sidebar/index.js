@@ -21,9 +21,14 @@ const sideItemList = [
     icon: <i className="nav-icon fas fa-store"></i>,
   },
   {
+    path: "/orders",
+    content: "Order List",
+    icon: <i className="nav-icon fas fa-shopping-cart"></i>,
+  },
+  {
     path: "/profile",
     content: "Profile",
-    icon: <i className="nav-icon fas fa-user"></i>,
+    icon: <i className="nav-icon fas fa-id-card"></i>,
   },
 ];
 
