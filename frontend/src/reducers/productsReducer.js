@@ -165,7 +165,7 @@ export const productFeaturedReducer = (
 export const productImageReducer = (
   state = {
     loading: false,
-    image: null,
+    image: "",
     error: null,
   },
   action

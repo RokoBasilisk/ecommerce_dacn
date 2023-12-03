@@ -10,6 +10,7 @@ import {
 import { ListItem } from "../components/atoms/CartItem/CartItem.styles";
 import Prefetch from "../components/molecules/Prefetch";
 import Modal from "../components/atoms/Modal";
+import Meta from "../components/atoms/Meta";
 
 export function Products({
   listProducts,
@@ -60,6 +61,7 @@ export function Products({
   };
   return (
     <>
+      <Meta title="Product List" />
       <div className="row">
         <div className="col-12">
           <div className="card">
@@ -105,7 +107,7 @@ export function Products({
             </div>
 
             <div className="card-body table-responsive p-0">
-              <table className="table table-hover text-nowrap">
+              <table className="table table-striped table-bordered table-hover text-nowrap">
                 <thead>
                   <tr>
                     <th>SKU</th>
@@ -146,7 +148,7 @@ export function Products({
                             </td>
                             <td>
                               {
-                                new Date(createdAt)
+                                new Date(updatedAt)
                                   .toGMTString()
                                   .split(" GMT")[0]
                               }

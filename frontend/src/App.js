@@ -27,36 +27,103 @@ import "admin-lte/plugins/fontawesome-free/css/all.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
 function App() {
+  const routeRender = [
+    {
+      path: "/register",
+      component: <Register />,
+    },
+    {
+      path: "/login",
+      component: <Login />,
+    },
+    {
+      path: "/products",
+      component: <Products />,
+      isPrivate: true,
+    },
+    {
+      path: "/orders",
+      component: <Order />,
+      isPrivate: true,
+    },
+    {
+      path: "/products/new",
+      component: <Product />,
+      isPrivate: true,
+    },
+    {
+      path: "/",
+      component: <DashBoard />,
+      isPrivate: true,
+    },
+    {
+      path: "*",
+      component: <MissingPage />,
+    },
+  ];
   return (
     <BrowserRouter>
       <Layout>
         {/* <Modal /> */}
         <QuantityModal />
         <Switch>
-          {/* <Route path="/order/:id/:pay?" component={Order} />
-          <Route path="/placeorder" component={PlaceOrder} />
-          <Route path="/payment" component={Payment} />
-          <Route path="/shipping" component={Shipping} />
-          <Route path="/profile" component={Profile} /> */}
-          <Route path="/register" component={Register} />
+          {/* <Route path="/register" component={Register} />
           <Route path="/login" component={Login} />
-          {/* <Route path="/cart" component={Cart} />
-          <Route path="/category/:cat/:pageNumber?" component={Category} /> */}
-          {/* <Route
-            path="/search/:keyword/page/:pageNumber"
+          <Route
+            path="/products"
             exact
-            component={Search}
-            />
-          <Route path="/search/:keyword" exact component={Search} /> */}
-          <Protect>
-            <HomeV2>
-              <Route path="/products" exact component={Products} />
-              <Route path="/products/new" exact component={Product} />
-              <Route path="/" exact component={DashBoard} />
-            </HomeV2>
-          </Protect>
-          <Route path="/404" exact component={MissingPage} />
-          <Route component={MissingPage} />
+            component={() => (
+              <Protect>
+                <HomeV2>
+                  <Products />
+                </HomeV2>
+              </Protect>
+            )}
+          />
+          <Route
+            path="/products/new"
+            exact
+            component={() => (
+              <Protect>
+                <HomeV2>
+                  <Product />
+                </HomeV2>
+              </Protect>
+            )}
+          />
+          <Route
+            path="/"
+            exact
+            component={() => (
+              <Protect>
+                <HomeV2>
+                  <DashBoard />
+                </HomeV2>
+              </Protect>
+            )}
+          /> */}
+          {/* </HomeV2> */}
+          {/* </Protect> */}
+          {/* <Route component={MissingPage} /> */}
+          {routeRender.map((route) => {
+            if (route.isPrivate) {
+              return (
+                <Route
+                  path={route.path}
+                  exact
+                  component={() => (
+                    <Protect>
+                      <HomeV2>{route.component}</HomeV2>
+                    </Protect>
+                  )}
+                />
+              );
+            } else {
+              return (
+                <Route path={route.path} component={() => route.component} />
+              );
+            }
+          })}
         </Switch>
       </Layout>
     </BrowserRouter>

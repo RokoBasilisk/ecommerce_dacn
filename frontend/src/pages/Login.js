@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
-import { login } from '../actions/userAction';
+import { login } from "../actions/userAction";
 
-import { ButtonPrimary, Col, Row } from '../styles/bootstrap.style';
+import { ButtonPrimary, Col, Row } from "../styles/bootstrap.style";
 
-import FormInput from '../components/atoms/FormInput';
-import Prefetch from '../components/molecules/Prefetch';
+import FormInput from "../components/atoms/FormInput";
+import Prefetch from "../components/molecules/Prefetch";
 
-export function Login({ location, login, history, userLogin }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const redirect = location.search ? location.search.split('=')[1] : '';
+export function Login({ login, userLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const history = useHistory();
+  const location = useLocation();
+  const redirect = location.search ? location.search.split("=")[1] : "";
   const { loading, error, userInfo } = userLogin;
   useEffect(() => {
     if (!loading && !error && userInfo) history.push(redirect);
@@ -27,7 +29,7 @@ export function Login({ location, login, history, userLogin }) {
       <Col md flexDirection="column">
         <h1>Sign in</h1>
         <Prefetch error={error} loading={loading} />
-        <form onSubmit={submitHandler} style={{ width: '100%' }}>
+        <form onSubmit={submitHandler} style={{ width: "100%" }}>
           <FormInput
             name="email"
             type="email"
@@ -52,11 +54,12 @@ export function Login({ location, login, history, userLogin }) {
 
         <Row>
           <Col>
-            <span style={{ color: 'gray' }}>
-              New customer?{' '}
+            <span style={{ color: "gray" }}>
+              New customer?{" "}
               <Link
-                style={{ color: 'black' }}
-                to={redirect ? `/register?redirect=${redirect}` : `/register`}>
+                style={{ color: "black" }}
+                to={redirect ? `/register?redirect=${redirect}` : `/register`}
+              >
                 Register
               </Link>
             </span>

@@ -15,7 +15,7 @@ import {
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,
   ORDER_LIST_CLEAR,
-} from '../types';
+} from "../types";
 
 export const orderCreateReducer = (state = {}, action) => {
   const { type, payload } = action;
@@ -35,7 +35,7 @@ export const orderCreateReducer = (state = {}, action) => {
 
 export const orderDetailsReducer = (
   state = { loading: false, orderItems: [] },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -68,7 +68,10 @@ export const orderPayReducer = (state = { loading: false }, action) => {
   }
 };
 
-export const orderListReducer = (state = { loading: false }, action) => {
+export const orderListReducer = (
+  state = { loading: false, error: null, orders: [] },
+  action
+) => {
   const { type, payload } = action;
   switch (type) {
     case ORDER_LIST_REQUEST:

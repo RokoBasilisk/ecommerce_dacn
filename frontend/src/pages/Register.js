@@ -1,36 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
-import { register } from '../actions/userAction';
+import { register } from "../actions/userAction";
 
-import { ButtonPrimary, Col, Row } from '../styles/bootstrap.style';
+import { ButtonPrimary, Col, Row } from "../styles/bootstrap.style";
 
-import Meta from '../components/atoms/Meta';
-import Prefetch from '../components/molecules/Prefetch';
-import FormInput from '../components/atoms/FormInput';
+import Meta from "../components/atoms/Meta";
+import Prefetch from "../components/molecules/Prefetch";
+import FormInput from "../components/atoms/FormInput";
 
-export function Register({
-  location,
-  register,
-  history,
-  userRegister,
-  userInfo,
-}) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [paypalEmail, setPaypalEmail] = useState('');
+export function Register({ register, userRegister, userInfo }) {
+  const history = useHistory();
+  const location = useLocation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [paypalEmail, setPaypalEmail] = useState("");
   const [message, setMessage] = useState({});
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const redirect = location.search ? location.search.split("=")[1] : "/";
   const { error, loading } = userRegister;
   useEffect(() => {
     if (!loading && !error && userInfo) history.push(redirect);
   }, [history, userInfo, redirect, loading, error]);
 
   function submitHandler(e) {
-     e.preventDefault();
+    e.preventDefault();
     if (
       name.length === 0 ||
       email.length === 0 ||
@@ -62,12 +58,12 @@ export function Register({
         <Meta title="Sign up" />
         <h1>Sign up</h1>
         <Prefetch error={error} loading={loading} />
-        <form onSubmit={submitHandler} style={{ width: '100%' }}>
+        <form onSubmit={submitHandler} style={{ width: "100%" }}>
           <FormInput
             name="name"
             type="text"
             value={name}
-            isInvalid={!!message['name']}
+            isInvalid={!!message["name"]}
             placeholder="Complete name"
             onChange={setName}
             autocomplete="complete-name"
@@ -76,7 +72,7 @@ export function Register({
             name="email"
             type="email"
             value={email}
-            isInvalid={!!message['email']}
+            isInvalid={!!message["email"]}
             onChange={setEmail}
             autocomplete="email"
           />
@@ -85,14 +81,14 @@ export function Register({
             type="email"
             value={paypalEmail}
             label="Paypal Email"
-            isInvalid={!!message['paypalEmail']}
+            isInvalid={!!message["paypalEmail"]}
             onChange={setPaypalEmail}
             autocomplete="paypal-email"
           />
           <FormInput
             name="password"
             disabled={loading}
-            isInvalid={!!message['password']}
+            isInvalid={!!message["password"]}
             type="password"
             placeholder="Password"
             value={password}
@@ -102,7 +98,7 @@ export function Register({
           <FormInput
             name="confirmPassword"
             disabled={loading}
-            isInvalid={!!message['confirmPassword']}
+            isInvalid={!!message["confirmPassword"]}
             type="password"
             label="Confirm Password"
             placeholder="Confirm Password"
@@ -118,11 +114,12 @@ export function Register({
 
         <Row>
           <Col>
-            <span style={{ color: 'gray' }}>
-              Already registered?{' '}
+            <span style={{ color: "gray" }}>
+              Already registered?{" "}
               <Link
-                style={{ color: 'black' }}
-                to={redirect ? `/login?redirect=${redirect}` : `/register`}>
+                style={{ color: "black" }}
+                to={redirect ? `/login?redirect=${redirect}` : `/register`}
+              >
                 Login
               </Link>
             </span>

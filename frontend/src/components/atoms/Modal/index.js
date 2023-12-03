@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDom from "react-dom";
 import { connect } from "react-redux";
 import { useHistory } from "react-router";
@@ -20,6 +20,8 @@ import PictureDisplay from "../PictureDisplay";
 import ProductData from "../../molecules/ProductData";
 import Prefetch from "../../molecules/Prefetch";
 import ProductContent from "../../molecules/ProductContent";
+import axios from "axios";
+import { prefixAPI } from "../../../types";
 
 export function QuantityModal({
   productDetails,

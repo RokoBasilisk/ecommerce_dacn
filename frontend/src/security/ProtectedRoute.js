@@ -8,7 +8,7 @@ export const Protect = ({ children, userInfo }) => {
   useEffect(() => {
     if (!userInfo) history.push("/login");
   }, [history, userInfo]);
-  return <>{children}</>;
+  return <>{userInfo ? children : null}</>;
 };
 
 const mapStateToProps = (state) => ({

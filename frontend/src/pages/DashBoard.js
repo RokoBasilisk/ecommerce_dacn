@@ -1,8 +1,10 @@
 import React from "react";
+import Meta from "../components/atoms/Meta";
 
 export const DashBoard = () => {
   return (
     <>
+      <Meta title="Dashboard" />
       <div className="row">
         <div className="col-lg-3 col-6">
           <div className="small-box bg-info">

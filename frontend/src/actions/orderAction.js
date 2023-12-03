@@ -30,7 +30,7 @@ export const createOrder = (order) => async (dispatch, getState) => {
         Authorization: `Bearer ${getState().userLogin.userInfo.token}`,
       },
     };
-    const { data } = await axios.post("${prefixAPI}/api/orders", order, config);
+    const { data } = await axios.post(`${prefixAPI}/api/orders`, order, config);
     dispatch({ type: ORDER_CREATE_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -62,7 +62,7 @@ export const getOrderDetails = (orderId) => async (dispatch, getState) => {
     };
 
     const { data } = await axios.get(
-      "${prefixAPI}/api/orders/" + orderId,
+      `${prefixAPI}/api/orders/` + orderId,
       config
     );
     dispatch({
@@ -98,10 +98,7 @@ export const getOrderList = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get(
-      "${prefixAPI}/api/orders/myorders",
-      config
-    );
+    const { data } = await axios.get(`${prefixAPI}/api/orders/`, config);
     dispatch({
       type: ORDER_LIST_SUCCESS,
       payload: data,

@@ -20,6 +20,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
   let iArr = [];
   let itemsPrice = 0;
 
+  // Validate orderItems
   if (orderItems && Object.keys(orderItems).length === 0) {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("No items in this order");
@@ -41,10 +42,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         });
     }
 
-    // price more than 100 is freeship
-    let shippingPrice = +itemsPrice > 100 ? 0 : 10;
-    let taxPrice = Number(0.15 * +itemsPrice).toFixed(2);
-    let totalPrice = +itemsPrice + +taxPrice + +shippingPrice;
+    let totalPrice = +itemsPrice;
     var order = new OrderModel({
       user: req.user._id,
       orderItems: iArr,
@@ -73,9 +71,14 @@ export const payoutForShop = asyncHandler(async (req, res) => {
   const orderId = req.params.orderId;
 
   if (!orderId) {
-    return res
-      .status(FAIL_HTTP_STATUS)
-      .json({ success: false, message: "orderId is not found" });
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("orderId is a must");
+  }
+
+  // validate orderId is match ObjectId type.
+  if (!orderId.match(/^[0-9a-fA-F]{24}$/)) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error(`Wrong type of orderId with ${orderId}`);
   }
 
   const order = await OrderModel.findById(orderId)
@@ -91,10 +94,20 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       },
     });
 
+  if (!order) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error(`Order ${orderId} is not found`);
+  }
+
+  if (order.user._id.toString() !== req.user._id.toString()) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("You must be the one who order.");
+  }
+
   if (order) {
-    if (order.paymentResult) {
+    if (order.paymentResult.payout_batch_id) {
       res.status(FAIL_HTTP_STATUS);
-      throw new Error("Order already paid");
+      throw new Error("Order already paid.");
     }
   }
 
