@@ -1,12 +1,15 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { listCategoriesNames } from '../actions/shopActions';
-import { logout } from '../actions/userAction';
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+import { io } from "socket.io-client";
 
-import { Container } from '../styles/main.styles';
+import { listCategoriesNames } from "../actions/shopActions";
+import { logout } from "../actions/userAction";
 
-import Footer from './organisms/Footer';
-import StoreHeader from './organisms/Header';
+import { Container } from "../styles/main.styles";
+
+import Footer from "./organisms/Footer";
+import StoreHeader from "./organisms/Header";
+import { prefixAPI } from "../types";
 
 export const Layout = ({
   logout,
@@ -31,7 +34,7 @@ export const Layout = ({
         featuredItemPerCategory={featuredItemPerCategory}
       />
       {/* <Container> */}
-        <main>{children}</main>
+      <main>{children}</main>
       {/* </Container> */}
       {/* <Footer /> */}
     </>

@@ -11,6 +11,7 @@ import { ListItem } from "../components/atoms/CartItem/CartItem.styles";
 import Prefetch from "../components/molecules/Prefetch";
 import Modal from "../components/atoms/Modal";
 import Meta from "../components/atoms/Meta";
+import { Pagination, Table } from "react-bootstrap";
 
 export function Products({
   listProducts,
@@ -19,12 +20,9 @@ export function Products({
   pages,
   page,
   loading,
-  history,
   deleteProduct,
   listProductModalDetails,
 }) {
-  const [showModal, setShowModal] = useState(false);
-  const [modalId, setModalId] = useState("");
   useEffect(() => {
     listProducts("", 1);
   }, [listProducts, deleteProduct]);
@@ -37,27 +35,83 @@ export function Products({
   }
 
   const renderPagination = () => {
+    const handlePagination = (e) => {
+      if (page !== e.target.text) {
+        listProducts("", e.target.text);
+      }
+    };
     const paginationList = [];
     for (let i = 1; i <= pages; i++) {
-      const isActive = page === i ? "active" : "";
       paginationList.push(
-        <li className={`page-item ${isActive}`} key={"page" + i}>
-          <a
-            className={`page-link ${isActive}`}
-            href=""
-            onClick={(event) => {
-              event.preventDefault();
-              if (page !== i) {
-                listProducts("", i);
-              }
-            }}
-          >
-            {i}
-          </a>
-        </li>
+        <Pagination.Item
+          key={i}
+          active={page === i}
+          onClick={handlePagination}
+          activeLabel=""
+        >
+          {i}
+        </Pagination.Item>
       );
     }
-    return paginationList;
+    return <Pagination size="md">{paginationList}</Pagination>;
+  };
+
+  const renderTableHeaders = () => {
+    return (
+      <thead className="thead-light">
+        <tr>
+          <th>SKU</th>
+          <th>Product Name</th>
+          <th>Unit Price</th>
+          <th>Count In Stock</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+    );
+  };
+  const renderTableRows = () => {
+    return (
+      <tbody>
+        {products &&
+          products.map(
+            (
+              { _id, name, unitPrice, countInStock, createdAt, updatedAt },
+              idx
+            ) => {
+              return (
+                <tr key={_id + name}>
+                  <td>{_id}</td>
+                  <td>{name}</td>
+                  <td>${unitPrice}</td>
+                  <td>{countInStock}</td>
+                  <td>{new Date(createdAt).toGMTString().split(" GMT")[0]}</td>
+                  <td>{new Date(updatedAt).toGMTString().split(" GMT")[0]}</td>
+                  <td>
+                    {" "}
+                    <i
+                      className="far fa-edit"
+                      style={{
+                        cursor: "pointer",
+                        marginRight: "10px",
+                      }}
+                      onClick={() => listProductModalDetails(_id)}
+                    ></i>
+                    <i
+                      className="fas fa-trash"
+                      style={{
+                        cursor: "pointer",
+                      }}
+                      onClick={() => deleteProduct(_id)}
+                    ></i>
+                  </td>
+                </tr>
+              );
+            }
+          )}
+      </tbody>
+    );
   };
   return (
     <>
@@ -66,21 +120,7 @@ export function Products({
         <div className="col-12">
           <div className="card">
             <div className="card-header">
-              <h3 className="card-title">
-                <ul className="pagination pagination-sm m-0 float-left">
-                  <li className="page-item">
-                    <a className="page-link" href="#">
-                      «
-                    </a>
-                  </li>
-                  {pages && renderPagination()}
-                  <li className="page-item">
-                    <a className="page-link" href="#">
-                      »
-                    </a>
-                  </li>
-                </ul>
-              </h3>
+              <h3 className="card-title">{pages && renderPagination()}</h3>
               <div className="card-tools">
                 <div
                   className="input-group input-group-md"
@@ -107,76 +147,15 @@ export function Products({
             </div>
 
             <div className="card-body table-responsive p-0">
-              <table className="table table-striped table-bordered table-hover text-nowrap">
-                <thead>
+              <Table bordered hover responsive>
+                {renderTableHeaders()}
+                {renderTableRows()}
+                {products.length === 0 && (
                   <tr>
-                    <th>SKU</th>
-                    <th>Product Name</th>
-                    <th>Unit Price</th>
-                    <th>Count In Stock</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Action</th>
+                    <td colSpan={8}>No Products, Create more</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {products &&
-                    products.map(
-                      (
-                        {
-                          _id,
-                          name,
-                          unitPrice,
-                          countInStock,
-                          createdAt,
-                          updatedAt,
-                        },
-                        idx
-                      ) => {
-                        return (
-                          <tr key={_id + name}>
-                            <td>{_id}</td>
-                            <td>{name}</td>
-                            <td>${unitPrice}</td>
-                            <td>{countInStock}</td>
-                            <td>
-                              {
-                                new Date(createdAt)
-                                  .toGMTString()
-                                  .split(" GMT")[0]
-                              }
-                            </td>
-                            <td>
-                              {
-                                new Date(updatedAt)
-                                  .toGMTString()
-                                  .split(" GMT")[0]
-                              }
-                            </td>
-                            <td>
-                              {" "}
-                              <i
-                                className="far fa-edit"
-                                style={{
-                                  cursor: "pointer",
-                                  marginRight: "10px",
-                                }}
-                                onClick={() => listProductModalDetails(_id)}
-                              ></i>
-                              <i
-                                className="fas fa-trash"
-                                style={{
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => deleteProduct(_id)}
-                              ></i>
-                            </td>
-                          </tr>
-                        );
-                      }
-                    )}
-                </tbody>
-              </table>
+                )}
+              </Table>
             </div>
           </div>
         </div>

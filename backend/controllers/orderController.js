@@ -9,6 +9,8 @@ import {
   FAIL_HTTP_STATUS,
   SUCCESS_HTTP_STATUS,
 } from "../constanst/ResultResponse.js";
+import { sendMessageToQueue } from "../utils/amqpHandle.js";
+import { exchangeNameEnum, routingKeyEnum } from "../constanst/AmqpEnum.js";
 
 const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 
@@ -16,25 +18,25 @@ const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 // @route POST /api/orders
 // @access Private
 export const addOrderItems = asyncHandler(async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod } = req.body;
-  let iArr = [];
+  const { products, shippingAddress, paymentMethod } = req.body;
+  let orderItems = [];
   let itemsPrice = 0;
 
-  // Validate orderItems
-  if (orderItems && Object.keys(orderItems).length === 0) {
+  // Validate products
+  if (products && products.length === 0) {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("No items in this order");
   } else {
-    for (let item of Object.keys(orderItems)) {
-      let quantity = orderItems[item];
-      await ProductModel.findById(sanitize(item))
+    // loop through every product in cart
+    for (let { productId, quantity } of products) {
+      await ProductModel.findById(sanitize(productId)) // get product by item to calculate total money
         .then((res) => {
-          iArr.push({
-            productId: res._id,
+          orderItems.push({
+            productId: productId,
             unitPrice: res.unitPrice,
             quantity: quantity,
-          });
-          itemsPrice += res.unitPrice * quantity;
+          }); // add product to order
+          itemsPrice += res.unitPrice * quantity; // calculate total money with formula: unitPrice * quantity
         })
         .catch((err) => {
           res.status(FAIL_HTTP_STATUS);
@@ -42,19 +44,44 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         });
     }
 
-    let totalPrice = +itemsPrice;
     var order = new OrderModel({
       user: req.user._id,
-      orderItems: iArr,
+      orderItems: orderItems,
       shippingAddress: sanitize(shippingAddress),
       paymentMethod: sanitize(paymentMethod || "PayPal"),
-      itemsPrice: sanitize(itemsPrice),
-      taxPrice,
-      shippingPrice,
-      totalPrice,
+      totalPrice: sanitize(itemsPrice),
     });
 
     const createdOrder = await order.save();
+    await createdOrder
+      .populate({
+        path: "orderItems",
+        populate: {
+          path: "productId",
+          populate: {
+            path: "user",
+            select: "-password",
+          },
+        },
+      })
+      .execPopulate();
+
+    const shopIdsList = [];
+    for (let {
+      productId: {
+        user: { _id },
+      },
+    } of createdOrder.orderItems) {
+      if (!shopIdsList.includes(_id.toString())) {
+        shopIdsList.push(_id);
+        sendMessageToQueue(
+          exchangeNameEnum.NOTIFICATION,
+          routingKeyEnum.ADD_ORDER,
+          _id.toString(),
+          `You have new order ${createdOrder._id}`
+        );
+      }
+    }
 
     res.status(SUCCESS_HTTP_STATUS).json({
       success: true,
@@ -203,7 +230,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
 });
 
 // @desc Get all orders
-// @route GET /api/orders/:id
+// @route GET /api/orders/
 // @access Private
 export const getAllOrders = asyncHandler(async (req, res) => {
   // get all product is created by shop and exist in order
@@ -291,18 +318,20 @@ export const getAllOrders = asyncHandler(async (req, res) => {
 // @access Private
 export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await OrderModel.findById(sanitize(req.params.id));
-
-  if (order) {
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
-
-    const updatedOrder = await order.save();
-    res.status(SUCCESS_HTTP_STATUS);
-    res.json(updatedOrder);
-  } else {
+  if (!order) {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
   }
+  if (order.isDelivered) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("Order is delivered!");
+  }
+  order.isDelivered = true;
+  order.deliveredAt = Date.now();
+
+  const updatedOrder = await order.save();
+  res.status(SUCCESS_HTTP_STATUS);
+  res.json({ _id: updatedOrder._id, updatedAt: updatedOrder.updatedAt });
 });
 
 // @desc Get logged user orders

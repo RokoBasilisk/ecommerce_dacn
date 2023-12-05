@@ -1,21 +1,12 @@
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import Home from "./pages/Home";
 import Product from "./pages/Product";
-import Category from "./pages/Category";
-import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import Shipping from "./pages/Shipping";
-import Payment from "./pages/Payment";
-import PlaceOrder from "./pages/PlaceOrder";
 import Order from "./pages/Order";
 import MissingPage from "./pages/MissingPage";
-import Search from "./pages/Search";
 import Layout from "./components/Layout";
 
-import Modal from "./components/organisms/Modal";
 import Protect from "./security/ProtectedRoute";
 import HomeV2 from "./pages/HomeV2";
 import DashBoard from "./pages/DashBoard";
@@ -25,8 +16,12 @@ import QuantityModal from "./components/atoms/Modal";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/plugins/fontawesome-free/css/all.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
+import { exchangeNameEnum, prefixAPI, routingKeyEnum } from "./types";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
+import { connect } from "react-redux";
 
-function App() {
+function App({ userInfo, webSocket }) {
   const routeRender = [
     {
       path: "/register",
@@ -61,50 +56,35 @@ function App() {
       component: <MissingPage />,
     },
   ];
+  useEffect(() => {
+    if (webSocket) {
+      webSocket.on("connect", () => {
+        webSocket.emit("join", userInfo._id);
+
+        webSocket.on(userInfo._id, () => {
+          console.log("Notification listen success");
+          webSocket.emit(
+            exchangeNameEnum.NOTIFICATION + routingKeyEnum.ADD_ORDER
+          );
+        });
+
+        webSocket.on(
+          exchangeNameEnum.NOTIFICATION + routingKeyEnum.ADD_ORDER,
+          (notification) => {
+            console.log("Notification received:", notification);
+          }
+        );
+      });
+      return () => {
+        webSocket.disconnect();
+      };
+    }
+  }, [userInfo]);
   return (
     <BrowserRouter>
       <Layout>
-        {/* <Modal /> */}
         <QuantityModal />
         <Switch>
-          {/* <Route path="/register" component={Register} />
-          <Route path="/login" component={Login} />
-          <Route
-            path="/products"
-            exact
-            component={() => (
-              <Protect>
-                <HomeV2>
-                  <Products />
-                </HomeV2>
-              </Protect>
-            )}
-          />
-          <Route
-            path="/products/new"
-            exact
-            component={() => (
-              <Protect>
-                <HomeV2>
-                  <Product />
-                </HomeV2>
-              </Protect>
-            )}
-          />
-          <Route
-            path="/"
-            exact
-            component={() => (
-              <Protect>
-                <HomeV2>
-                  <DashBoard />
-                </HomeV2>
-              </Protect>
-            )}
-          /> */}
-          {/* </HomeV2> */}
-          {/* </Protect> */}
-          {/* <Route component={MissingPage} /> */}
           {routeRender.map((route) => {
             if (route.isPrivate) {
               return (
@@ -130,4 +110,11 @@ function App() {
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  userInfo: state.userLogin.userInfo,
+  webSocket: state.userLogin.webSocket,
+});
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

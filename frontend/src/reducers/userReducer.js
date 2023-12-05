@@ -1,3 +1,4 @@
+import { io } from "socket.io-client";
 import {
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
@@ -19,7 +20,8 @@ import {
   USER_LIST_DETAILS_REQUEST,
   USER_LIST_DETAILS_SUCCESS,
   USER_LIST_DETAILS_FAIL,
-} from '../types';
+  prefixAPI,
+} from "../types";
 
 export const userLoginReducer = (state = {}, action) => {
   const { type, payload } = action;
@@ -28,10 +30,14 @@ export const userLoginReducer = (state = {}, action) => {
       return { loading: true, userInfo: {} };
     case USER_UPDATE_PROFILE_SUCCESS:
     case USER_LOGIN_SUCCESS:
-      return { loading: false, userInfo: payload };
+      const webSocket = io(prefixAPI, {
+        transports: ["websocket"],
+      });
+      return { loading: false, userInfo: payload, webSocket: webSocket };
     case USER_LOGIN_FAIL:
       return { loading: false, error: payload };
     case USER_LOGOUT:
+      state.webSocket.emit("logout");
       return {};
     default:
       return state;
@@ -54,7 +60,7 @@ export const userRegisterReducer = (state = {}, action) => {
 
 export const userUpdateProfileReducer = (
   state = { loading: false },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -77,7 +83,7 @@ export const userListReducer = (
     pages: [],
     page: [],
   },
-  action,
+  action
 ) => {
   const { type, payload } = action;
   switch (type) {

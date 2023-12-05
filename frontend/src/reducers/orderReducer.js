@@ -82,6 +82,17 @@ export const orderListReducer = (
       return { loading: false, error: payload };
     case ORDER_LIST_CLEAR:
       return { loading: false };
+    case ORDER_DETAILS_SUCCESS:
+      const updateOrders = state.orders.map((el) => {
+        if (el._id === payload._id) {
+          el.isDelivered = true;
+          el.updatedAt = payload.updatedAt;
+        }
+        return el;
+      });
+      return { loading: false, orders: updateOrders };
+    case ORDER_DETAILS_FAIL:
+      return { loading: false, error: payload };
     default:
       return state;
   }

@@ -15,6 +15,14 @@ export function Product({
   uploadImage,
   createProduct,
 }) {
+  const validateMessageEnums = {
+    FIELD_REQUIRED: (validateField) =>
+      `Please fill required *${validateField}*`,
+    IMAGE_TYPE_REQUIRE: () =>
+      `Please select a valid image file (JPEG, PNG, JPG)`,
+    IMAGE_SIZE_TOO_LARGE: () =>
+      `Selected file is too large. Please choose a smaller file.`,
+  };
   const [dataForm, setDataForm] = useState({
     name: "",
     description: "",
@@ -60,8 +68,6 @@ export function Product({
 
   const handleCategorySelect = (e) => {
     const { value } = e.target;
-    console.log(value);
-    //
     if (dataForm.category.includes(value)) {
       let categoryListNew = dataForm.category.filter(
         (category) => category !== value
@@ -81,16 +87,18 @@ export function Product({
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
     if (file) {
       // Perform validation if needed (e.g., file type, size)
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"]; // Add more valid types if needed
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!validTypes.includes(file.type)) {
-        alert("Please select a valid image file (JPEG, PNG, JPG)");
-        return;
+        alert(validateMessageEnums.IMAGE_TYPE_REQUIRE());
+        e.target.value = "";
+        return false;
       }
 
       // Validate file size
       if (file.size > MAX_FILE_SIZE) {
-        alert("Selected file is too large. Please choose a smaller file.");
-        return;
+        alert(validateMessageEnums.IMAGE_SIZE_TOO_LARGE());
+        e.target.value = "";
+        return false;
       }
       uploadImage(file); // upload file
     }
@@ -114,10 +122,7 @@ export function Product({
   const blankValidate = (target, fields) => {
     let isValid = true;
     let errorField = null;
-    const validateMessageEnums = {
-      FIELD_REQUIRED: (validateField) =>
-        `Please fill required *${validateField}*`,
-    };
+
     for (let propertyName of Object.getOwnPropertyNames(target)) {
       // If validate invalid data, out loop
       if (!isValid) break;
@@ -128,9 +133,9 @@ export function Product({
 
       // Invalid data found, set data for display
       isValid = false;
-      console.log(validateMessageEnums.FIELD_REQUIRED);
-      errorField = validateMessageEnums.FIELD_REQUIRED(errorField);
+      errorField = validateMessageEnums.FIELD_REQUIRED(propertyName);
     }
+
     if (!isValid) alert(errorField);
     return isValid;
   };
@@ -174,13 +179,19 @@ export function Product({
             onChange={handleDataChange}
           />
 
-          <div style={{ display: "grid", gridTemplateColumns: "200px 1fr" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "200px 1fr",
+              gap: "10px",
+            }}
+          >
             <select
               multiple
               size={categories.length} // Adjust as needed
               style={{
                 width: "200px",
-                height: "100px",
+                height: "200px",
                 userSelect: "none",
                 overflowY: "hidden",
               }} // Adjust container width
@@ -219,8 +230,11 @@ export function Product({
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexWrap: "wrap",
                 width: "1fr",
+                alignContent: "flex-start",
+                overflowY: "scroll",
+                gap: "0 10px",
               }}
             >
               {dataForm.category.map((category, index) => {
@@ -229,14 +243,18 @@ export function Product({
                 return (
                   <div
                     key={splitCategory[2]}
-                    style={{ marginBottom: "5px", marginTop: "5px" }}
+                    style={{
+                      marginBottom: "5px",
+                      marginTop: "5px",
+                    }}
                   >
                     <div
                       style={{
                         width: "fit-content",
-                        background: "#f8e3ae",
+                        background: "#FFFFFF",
                         cursor: "pointer",
                         padding: 5,
+                        border: "3px solid #f8e3ae",
                         borderRadius: "0.5rem",
                       }}
                       onClick={() => {
@@ -266,14 +284,22 @@ export function Product({
             </div>
           </div>
         </div>
-        <div>
+        {/* Image select section */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
           <input type="file" accept="image/*" onChange={handleImageChange} />
-          <div>
+          <div style={{ textAlign: "center" }}>
             {image && (
               <img
                 src={`http://localhost:5000${image}`}
                 alt="Uploaded"
                 width="200"
+                style={{}}
               />
             )}
           </div>

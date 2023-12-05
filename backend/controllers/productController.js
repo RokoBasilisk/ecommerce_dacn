@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 // @access Public
 export const getProducts = asyncHandler(async (req, res) => {
   const pageSize = 8;
-  const page = Number(req.query.pageNumber);
+  const page = Number(req.query.pageNumber) || 1;
 
   const keyword = req.query.keyword
     ? {

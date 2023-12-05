@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router";
 
@@ -6,6 +6,7 @@ import AsideBar from "../components/organisms/Sidebar";
 
 export const HomeV2 = ({ children }) => {
   let history = useHistory();
+
   return (
     <>
       <div className="wrapper">

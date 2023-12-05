@@ -13,9 +13,10 @@ export const CreateFormInput = ({
   const capitalizeName = name.charAt(0).toUpperCase() + name.slice(1);
   return (
     <InputGroup>
-      <InputLabel name={name}>{capitalizeName}:</InputLabel>
+      <InputLabel for={name}>{capitalizeName}:</InputLabel>
       <InputField
         name={name}
+        id={name}
         value={value}
         onChange={onChange}
         placeholder={isHolder ? `Enter ${capitalizeName}` : ""}

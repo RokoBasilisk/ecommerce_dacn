@@ -24,6 +24,7 @@ export default function ProductData({
   showDesc = true,
   name,
   unitPrice,
+  image,
   ratingAverage,
   numReviews,
   description,
@@ -44,7 +45,7 @@ export default function ProductData({
   };
 
   return (
-    <Wrapper>
+    <Wrapper className="card card-body">
       <InputText
         value={formData.name}
         name="name"
@@ -66,6 +67,15 @@ export default function ProductData({
           name="description"
           onChange={handleInputChange}
         />
+      )}
+      {image && (
+        <div>
+          <img
+            style={{ width: "100%", height: "300px" }}
+            alt={name}
+            src={`http://localhost:5000${image}`}
+          />
+        </div>
       )}
       <FlexColumn>
         <Quantity qty={qty} setQty={setQty} numInStock={countInStock} />

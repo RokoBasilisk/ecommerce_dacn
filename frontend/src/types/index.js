@@ -129,3 +129,11 @@ export const PRODUCT_UPLOAD_IMAGE_SUCCESS = "PRODUCT_UPLOAD_IMAGE_SUCCESS";
 export const PRODUCT_UPLOAD_IMAGE_FAIL = "PRODUCT_UPLOAD_IMAGE_FAIL";
 
 export const prefixAPI = "http://localhost:5000";
+
+export const routingKeyEnum = {
+  ADD_ORDER: "ADD_ORDER",
+};
+
+export const exchangeNameEnum = {
+  NOTIFICATION: "notification",
+};

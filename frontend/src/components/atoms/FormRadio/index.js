@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import { FormCheck, FormInput, FormLabel } from './FormRadio.style';
+import { FormCheck, FormInput, FormLabel } from "./FormRadio.style";
 
 export default function FormRadio({
   labelText,
