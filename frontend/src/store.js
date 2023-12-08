@@ -30,7 +30,6 @@ import {
   featuredMessageReducer,
 } from "./reducers/shopReducer";
 import { prefixAPI } from "./types";
-import { io } from "socket.io-client";
 
 const reducer = combineReducers({
   featuredItemsPerCategory: featuredItemsPerCategoryReducer,
@@ -77,12 +76,6 @@ const initialState = {
     userInfo: storageUserInfo,
   },
 };
-
-if (storageUserInfo) {
-  initialState.userLogin.webSocket = io(prefixAPI, {
-    transports: ["websocket"],
-  });
-}
 
 const middleware = [thunk];
 const store = createStore(

@@ -132,6 +132,7 @@ export const prefixAPI = "http://localhost:5000";
 
 export const routingKeyEnum = {
   ADD_ORDER: "ADD_ORDER",
+  PAY_ORDER: "PAY_ORDER",
 };
 
 export const exchangeNameEnum = {

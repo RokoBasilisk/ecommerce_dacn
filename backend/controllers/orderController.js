@@ -73,12 +73,12 @@ export const addOrderItems = asyncHandler(async (req, res) => {
       },
     } of createdOrder.orderItems) {
       if (!shopIdsList.includes(_id.toString())) {
-        shopIdsList.push(_id);
+        shopIdsList.push(_id.toString());
         sendMessageToQueue(
           exchangeNameEnum.NOTIFICATION,
-          routingKeyEnum.ADD_ORDER,
-          _id.toString(),
-          `You have new order ${createdOrder._id}`
+          routingKeyEnum.ADD_ORDER + "_" + _id.toString(),
+          createdOrder._id.toString(),
+          `You have new order ${createdOrder._id.toString()}`
         );
       }
     }
@@ -197,6 +197,14 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       order.isPaid = true;
       order.paidAt = date;
       order.save();
+      for (let _id of Object.keys(sellerMoney)) {
+        sendMessageToQueue(
+          exchangeNameEnum.NOTIFICATION,
+          routingKeyEnum.PAY_ORDER + "_" + _id.toString(),
+          order._id.toString(),
+          `You have new order ${order._id.toString()}`
+        );
+      }
       res.status(SUCCESS_HTTP_STATUS);
       return res.json({ success: true });
     })
@@ -330,6 +338,13 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
   order.deliveredAt = Date.now();
 
   const updatedOrder = await order.save();
+
+  sendMessageToQueue(
+    exchangeNameEnum.NOTIFICATION,
+    routingKeyEnum.UPDATE_ORDER + "_" + updatedOrder.user.toString(),
+    updatedOrder._id.toString(),
+    `You have new order ${updatedOrder._id.toString()}`
+  );
   res.status(SUCCESS_HTTP_STATUS);
   res.json({ _id: updatedOrder._id, updatedAt: updatedOrder.updatedAt });
 });

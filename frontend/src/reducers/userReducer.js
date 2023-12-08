@@ -1,4 +1,3 @@
-import { io } from "socket.io-client";
 import {
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
@@ -30,14 +29,10 @@ export const userLoginReducer = (state = {}, action) => {
       return { loading: true, userInfo: {} };
     case USER_UPDATE_PROFILE_SUCCESS:
     case USER_LOGIN_SUCCESS:
-      const webSocket = io(prefixAPI, {
-        transports: ["websocket"],
-      });
-      return { loading: false, userInfo: payload, webSocket: webSocket };
+      return { loading: false, userInfo: payload };
     case USER_LOGIN_FAIL:
       return { loading: false, error: payload };
     case USER_LOGOUT:
-      state.webSocket.emit("logout");
       return {};
     default:
       return state;

@@ -6,6 +6,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
+import amqp from "amqplib";
 
 import { basicInfo } from "./docs/basicInfo.js";
 import connectDB from "./config/db.js";
@@ -16,11 +17,9 @@ import orderRoutes from "./routes/orderRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { isCustomer, protect } from "./middleware/authMiddleware.js";
-import {
-  consumeMessagesFromQueue,
-  sendMessageToQueue,
-} from "./utils/amqpHandle.js";
+import { consumeMessagesFromQueue } from "./utils/amqpHandle.js";
 import { exchangeNameEnum, routingKeyEnum } from "./constanst/AmqpEnum.js";
+import { socketHandle } from "./socket.js";
 
 dotenv.config();
 
@@ -29,40 +28,8 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const connectedUsers = new Map();
 
-io.on("connection", (socket) => {
-  socket.on("join", async (userId) => {
-    if (!connectedUsers.get(socket.id)) {
-      connectedUsers.set(socket.id, userId);
-      console.log(`${userId} connect to server`);
-      socket.emit(userId);
-    }
-  });
-  socket.on(
-    exchangeNameEnum.NOTIFICATION + routingKeyEnum.ADD_ORDER,
-    async () => {
-      consumeMessagesFromQueue(
-        exchangeNameEnum.NOTIFICATION,
-        routingKeyEnum.ADD_ORDER,
-        connectedUsers.get(socket.id),
-        socket
-      );
-    }
-  );
-
-  socket.on("logout", () => {
-    socket.emit("logout");
-  });
-
-  socket.on("disconnect", () => {
-    let userId = connectedUsers.get(socket.id);
-    if (userId) {
-      connectedUsers.delete(socket.id);
-      console.log(`${userId} Client disconnected`);
-    }
-  });
-});
+socketHandle(io);
 
 app.use(cors());
 
@@ -113,8 +80,3 @@ server.listen(
   PORT,
   console.log(`Server runing in ${process.env.NODE_ENV} on port ${PORT}`)
 );
-
-// server.listen(
-//   PORT,
-//   console.log(`socket server runing in ${process.env.NODE_ENV} on port ${PORT}`)
-// );
