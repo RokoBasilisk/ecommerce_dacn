@@ -53,18 +53,24 @@ export const consumeMessagesFromQueue = async (
 
     // Bind the queue to the exchange with the routing key
     await channel.bindQueue(assertQueue.queue, exchangeName, routingKey);
-
+    console.log("bind queue with", exchangeName, routingKey);
     // Consume messages from the queue
     channel.consume(
       assertQueue.queue,
-      (message) => {
+      async (message) => {
         if (message) {
+          console.log(assertQueue);
           console.log(`Received message: ${message.content.toString()}`);
-          channel.ack(message); // Acknowledge the message
+          const _id = JSON.parse(message.content.toString())._id;
+          // Process the message here
           socket.emit(
             exchangeName + "_" + routingKey,
-            message.content.toString()
+            JSON.parse(message.content.toString())
           );
+
+          // Acknowledge the message
+          channel.ack(message);
+          await channel.deleteQueue(_id);
         }
       },
       { noAck: false }

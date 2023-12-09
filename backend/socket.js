@@ -1,3 +1,8 @@
+import amqp from "amqplib";
+
+import { consumeMessagesFromQueue } from "./utils/amqpHandle.js";
+import { exchangeNameEnum, routingKeyEnum } from "./constanst/AmqpEnum.js";
+
 const onJoin = (userId, socket, connectedUsers) => {
   if (!connectedUsers.get(userId)) {
     connectedUsers.set(userId, socket.id);
@@ -6,11 +11,13 @@ const onJoin = (userId, socket, connectedUsers) => {
   }
 };
 
-const onAddOrder = (userId, socket, channel, connectedUsers) => {
+const onAddOrder = async (userId, socket, channel, connectedUsers) => {
   if (connectedUsers.has(userId)) {
-    consumeMessagesFromQueue(
+    console.log(connectedUsers, userId);
+
+    await consumeMessagesFromQueue(
       exchangeNameEnum.NOTIFICATION,
-      routingKeyEnum.ADD_ORDER + "_" + key,
+      routingKeyEnum.ADD_ORDER + "_" + userId,
       "",
       socket,
       channel
@@ -22,7 +29,7 @@ const onPayOrder = (userId, socket, channel, connectedUsers) => {
   if (connectedUsers.has(userId)) {
     consumeMessagesFromQueue(
       exchangeNameEnum.NOTIFICATION,
-      routingKeyEnum.PAY_ORDER + "_" + key,
+      routingKeyEnum.PAY_ORDER + "_" + userId,
       "",
       socket,
       channel
@@ -34,7 +41,7 @@ const onUpdateOrder = (userId, socket, channel, connectedUsers) => {
   if (connectedUsers.has(userId)) {
     consumeMessagesFromQueue(
       exchangeNameEnum.NOTIFICATION,
-      routingKeyEnum.UPDATE_ORDER + "_" + key,
+      routingKeyEnum.UPDATE_ORDER + "_" + userId,
       "",
       socket,
       channel

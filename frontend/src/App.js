@@ -1,6 +1,7 @@
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
 
 import Product from "./pages/Product";
 import Login from "./pages/Login";
@@ -21,6 +22,7 @@ import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/plugins/fontawesome-free/css/all.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
+import "react-toastify/dist/ReactToastify.css";
 function App({ userInfo, webSocket }) {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const routeRender = [
@@ -82,11 +84,15 @@ function App({ userInfo, webSocket }) {
     }
 
     function onAddOrder(notification) {
-      console.log("Notification received *Add Order*:", notification);
+      toast.info(notification.message, {
+        className: "text-info",
+      });
     }
 
     function onPayOrder(notification) {
-      console.log("Notification received *Pay Order*:", notification);
+      toast(notification.message, {
+        className: "text-info",
+      });
     }
 
     function onJoin() {
@@ -99,7 +105,7 @@ function App({ userInfo, webSocket }) {
         exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER,
         userInfo._id
       );
-      console.log("Notification listen...");
+      console.log("Notification listen...", userInfo._id);
       socket.on(
         exchangeNameEnum.NOTIFICATION +
           "_" +
@@ -145,57 +151,6 @@ function App({ userInfo, webSocket }) {
     };
   }, [userInfo]);
 
-  // useEffect(() => {
-  //   let isFirstConnection = true;
-  //   if (webSocket) {
-  //     if (isFirstConnection) {
-  //       webSocket.on("connect", () => {
-  //         webSocket.emit("join", userInfo._id);
-
-  //         webSocket.on(userInfo._id, () => {
-  //           console.log("Notification listen...");
-  //           webSocket.emit(
-  //             exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER,
-  //             userInfo._id
-  //           );
-  //           webSocket.emit(
-  //             exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER,
-  //             userInfo._id
-  //           );
-  //         });
-
-  //         webSocket.on(
-  //           exchangeNameEnum.NOTIFICATION +
-  //             "_" +
-  //             routingKeyEnum.ADD_ORDER +
-  //             "_" +
-  //             userInfo._id,
-  //           (notification) => {
-  //             console.log("Notification received *Add Order*:", notification);
-  //           }
-  //         );
-
-  //         webSocket.on(
-  //           exchangeNameEnum.NOTIFICATION +
-  //             "_" +
-  //             routingKeyEnum.PAY_ORDER +
-  //             "_" +
-  //             userInfo._id,
-  //           (notification) => {
-  //             console.log(
-  //               "Notification received *Payout Order*:",
-  //               notification
-  //             );
-  //           }
-  //         );
-  //         isFirstConnection = false;
-  //       });
-  //       return () => {
-  //         webSocket.disconnect();
-  //       };
-  //     }
-  //   }
-  // }, [webSocket]);
   return (
     <BrowserRouter>
       <Layout>
@@ -227,6 +182,13 @@ function App({ userInfo, webSocket }) {
           })}
         </Switch>
       </Layout>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        closeOnClick
+        theme="light"
+        limit={3}
+      />
     </BrowserRouter>
   );
 }

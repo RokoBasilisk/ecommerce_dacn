@@ -78,7 +78,10 @@ export const addOrderItems = asyncHandler(async (req, res) => {
           exchangeNameEnum.NOTIFICATION,
           routingKeyEnum.ADD_ORDER + "_" + _id.toString(),
           createdOrder._id.toString(),
-          `You have new order ${createdOrder._id.toString()}`
+          JSON.stringify({
+            _id: createdOrder._id.toString(),
+            message: `You have new order ${createdOrder._id.toString()}`,
+          })
         );
       }
     }
@@ -202,7 +205,10 @@ export const payoutForShop = asyncHandler(async (req, res) => {
           exchangeNameEnum.NOTIFICATION,
           routingKeyEnum.PAY_ORDER + "_" + _id.toString(),
           order._id.toString(),
-          `You have new order ${order._id.toString()}`
+          JSON.stringify({
+            _id: order._id.toString(),
+            message: `You have new order ${order._id.toString()}`,
+          })
         );
       }
       res.status(SUCCESS_HTTP_STATUS);
@@ -343,7 +349,10 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
     exchangeNameEnum.NOTIFICATION,
     routingKeyEnum.UPDATE_ORDER + "_" + updatedOrder.user.toString(),
     updatedOrder._id.toString(),
-    `You have new order ${updatedOrder._id.toString()}`
+    JSON.stringify({
+      _id: order._id.toString(),
+      message: `Your order ${updatedOrder._id.toString()} have been update`,
+    })
   );
   res.status(SUCCESS_HTTP_STATUS);
   res.json({ _id: updatedOrder._id, updatedAt: updatedOrder.updatedAt });

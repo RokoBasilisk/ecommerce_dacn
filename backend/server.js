@@ -6,7 +6,6 @@ import swaggerJsdoc from "swagger-jsdoc";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
-import amqp from "amqplib";
 
 import { basicInfo } from "./docs/basicInfo.js";
 import connectDB from "./config/db.js";
@@ -17,8 +16,6 @@ import orderRoutes from "./routes/orderRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { isCustomer, protect } from "./middleware/authMiddleware.js";
-import { consumeMessagesFromQueue } from "./utils/amqpHandle.js";
-import { exchangeNameEnum, routingKeyEnum } from "./constanst/AmqpEnum.js";
 import { socketHandle } from "./socket.js";
 
 dotenv.config();
