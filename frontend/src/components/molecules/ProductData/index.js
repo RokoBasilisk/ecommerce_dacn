@@ -17,6 +17,7 @@ import {
 import Quantity from "../../atoms/Quantity";
 import Rating from "../../atoms/Rating";
 import { InputText, InputArea } from "../../atoms/FormInput/FormInput.style";
+import { prefixAPI } from "../../../types";
 
 export default function ProductData({
   showLinks = false,
@@ -73,7 +74,7 @@ export default function ProductData({
           <img
             style={{ width: "100%", height: "300px" }}
             alt={name}
-            src={`http://localhost:5000${image}`}
+            src={prefixAPI + image}
           />
         </div>
       )}

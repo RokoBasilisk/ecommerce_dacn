@@ -128,7 +128,7 @@ export const PRODUCT_UPLOAD_IMAGE_REQUEST = "PRODUCT_UPLOAD_IMAGE_REQUEST";
 export const PRODUCT_UPLOAD_IMAGE_SUCCESS = "PRODUCT_UPLOAD_IMAGE_SUCCESS";
 export const PRODUCT_UPLOAD_IMAGE_FAIL = "PRODUCT_UPLOAD_IMAGE_FAIL";
 
-export const prefixAPI = "http://localhost:5000";
+export const prefixAPI = "https://backend-datn-2024.onrender.com";
 
 export const routingKeyEnum = {
   ADD_ORDER: "ADD_ORDER",

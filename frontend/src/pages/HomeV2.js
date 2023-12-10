@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { useHistory } from "react-router";
 
 import AsideBar from "../components/organisms/Sidebar";
+import { Container } from "react-bootstrap";
 
 export const HomeV2 = ({ children }) => {
   let history = useHistory();
@@ -28,7 +29,7 @@ export const HomeV2 = ({ children }) => {
 
           {/* Main content */}
           <section className="content">
-            <div className="container-fluid">{children}</div>
+            <Container fluid>{children}</Container>
           </section>
           {/* /.content */}
         </div>

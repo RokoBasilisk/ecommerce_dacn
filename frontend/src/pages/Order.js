@@ -14,6 +14,7 @@ import Loader from "../components/organisms/Loader";
 import Message from "../components/atoms/MessageComponent";
 import PageLoader from "../components/molecules/PageLoader";
 import Meta from "../components/atoms/Meta";
+import { prefixAPI } from "../types";
 
 export const Order = ({ orderList, getOrderList, setAsDeliveredAdmin }) => {
   const { loading, error, orders } = orderList;
@@ -193,7 +194,7 @@ export const Order = ({ orderList, getOrderList, setAsDeliveredAdmin }) => {
                 <tr key={_id}>
                   <td className="table-active"></td>
                   <td>
-                    <Image src={`http://localhost:5000${image}`} rounded />
+                    <Image src={prefixAPI + image} rounded />
                   </td>
                   <td>{name}</td>
                   <td>${unitPrice}</td>
