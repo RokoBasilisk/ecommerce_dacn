@@ -105,18 +105,18 @@ export const getCategoryNames = asyncHandler(async (req, res) => {
 });
 
 // @desc Fetch all product of a given category
-// @route GET /api/products/category/:cat
+// @route Post /api/products/category/
 // @access Public
 export const getProductByCategory = asyncHandler(async (req, res) => {
   const pageSize = 8;
-  const page = Number(req.query.pageNumber);
+  const page = Number(req.body.pageNumber);
 
   const count = await ProductModel.countDocuments({
-    category: { $in: [sanitize(req.params.category)] },
+    category: { $in: sanitize(req.body.categories) },
   });
 
   const category = await ProductModel.find({
-    category: { $in: [sanitize(req.params.category)] },
+    category: { $in: sanitize(req.body.categories) },
   })
     .limit(pageSize)
     .skip(pageSize * (page - 1));
