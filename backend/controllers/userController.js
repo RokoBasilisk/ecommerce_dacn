@@ -20,6 +20,7 @@ const __dirname = path.dirname(__filename);
 // @access Public
 export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log("?");
 
   const user = await UserModel.findOne({ email });
   if (!user) {
