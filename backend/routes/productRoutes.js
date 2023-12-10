@@ -34,7 +34,7 @@ router.route("/:id").patch(protect, isShop, updateProductAdmin);
 
 router.route("/category/name").get(getCategoryNames);
 
-router.route("/category/:category").get(getProductByCategory);
+router.route("/category/").post(getProductByCategory);
 
 router.route("/:id/reviews").post(protect, isCustomer, addReview);
 
