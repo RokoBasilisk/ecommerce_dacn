@@ -111,13 +111,16 @@ export const getProductByCategory = asyncHandler(async (req, res) => {
   const pageSize = 8;
   const page = Number(req.body.pageNumber);
 
-  const count = await ProductModel.countDocuments({
-    category: { $in: sanitize(req.body.categories) },
-  });
+  const condition =
+    req.body.categories && req.body.categories.length > 0
+      ? {
+          category: { $in: sanitize(req.body.categories) },
+        }
+      : {};
 
-  const category = await ProductModel.find({
-    category: { $in: sanitize(req.body.categories) },
-  })
+  const count = await ProductModel.countDocuments(condition);
+
+  const category = await ProductModel.find(condition)
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
@@ -255,41 +258,4 @@ export const addReview = asyncHandler(async (req, res) => {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Product not found");
   }
-});
-
-// @desc Get top rated products
-// @route POST /api/product/top/:category
-// @access Public
-export const getTopProducts = asyncHandler(async (req, res) => {
-  const limitSize = Number(req.query.pageSize) || 3;
-  let queryParams = {};
-  if (req.params.category) {
-    queryParams = {
-      category: { $in: [sanitize(req.params.category)] },
-      isDeleted: false,
-    };
-  }
-  const products = await ProductModel.find(queryParams)
-    .sort({ ratingAverage: -1 })
-    .limit(limitSize);
-  res.status(SUCCESS_HTTP_STATUS);
-  return res.json(products);
-});
-
-// @desc Get featured products
-// @route POST /api/product/featured/:category
-// @access Public
-export const getFeaturedProducts = asyncHandler(async (req, res) => {
-  const limitSize = Number(req.query.pageSize) || 3;
-  let queryParams = { featured: true };
-  if (req.params.category) {
-    queryParams = {
-      category: { $in: [sanitize(req.params.category)] },
-    };
-  }
-  const products = await ProductModel.find(queryParams)
-    .sort({ ratingAverage: -1 })
-    .limit(limitSize);
-  res.status(SUCCESS_HTTP_STATUS);
-  return res.json(products);
 });

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { Card, CardBody, CardHeader, Col, Form, Row } from "react-bootstrap";
+
+import "react-quill/dist/quill.snow.css";
 
 import { uploadImage, createProduct } from "../actions/productActions";
-
 import CreateFormInput from "../components/atoms/CreateFormInput";
 import Meta from "../components/atoms/Meta";
 import axios from "axios";
 import { prefixAPI } from "../types";
-import { Card, CardBody, CardHeader, Col, Form, Row } from "react-bootstrap";
+import EmptyImage from "../assets/emptyImage.svg";
 
 export function Product({ productImage, uploadImage, createProduct }) {
   const validateMessageEnums = {
@@ -187,65 +189,16 @@ export function Product({ productImage, uploadImage, createProduct }) {
                   display: "flex",
                   flexDirection: "column",
                 }}
-              >
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "200px 1fr",
-                    gap: "10px",
-                  }}
-                >
-                  <Col className="overflow-hidden">
-                    <Form.Select
-                      style={{ overflowY: "scroll" }}
-                      aria-label="Default select example"
-                      multiple
-                    >
-                      {categories.length != 0 &&
-                        categories.map(
-                          ({ _id, categoryName, categoryIcon }, index) => {
-                            const categoryHash =
-                              categoryName + "|" + categoryIcon + "|" + _id;
-                            return (
-                              <option
-                                key={_id}
-                                value={categoryHash}
-                                style={{
-                                  background: dataForm.category.includes(
-                                    categoryHash
-                                  )
-                                    ? "lightblue"
-                                    : "",
-                                }}
-                                onClick={() => {
-                                  handleCategorySelect({
-                                    target: {
-                                      value: categoryHash,
-                                    },
-                                  });
-                                }}
-                              >
-                                {categoryName}
-                              </option>
-                            );
-                          }
-                        )}
-                    </Form.Select>
-                  </Col>
-                  {/* <select
+              ></div>
+            </CardBody>
+            <Card.Footer>
+              <Card.Header>Product Category</Card.Header>
+              <Row className="justify-content-between mt-3">
+                <Col className="overflow-hidden" sm={3}>
+                  <Form.Select
+                    style={{ overflowY: "scroll" }}
+                    aria-label="Default select example"
                     multiple
-                    size={categories.length} // Adjust as needed
-                    style={{
-                      width: "200px",
-                      height: "200px",
-                      userSelect: "none",
-                      overflowY: "hidden",
-                    }} // Adjust container width
-                    name="category"
-                    value={dataForm.category}
-                    onChange={() => {
-                      // do nothing
-                    }}
                   >
                     {categories.length != 0 &&
                       categories.map(
@@ -276,7 +229,9 @@ export function Product({ productImage, uploadImage, createProduct }) {
                           );
                         }
                       )}
-                  </select> */}
+                  </Form.Select>
+                </Col>
+                <Col sm={9}>
                   <div
                     style={{
                       display: "flex",
@@ -300,7 +255,6 @@ export function Product({ productImage, uploadImage, createProduct }) {
                         >
                           <div
                             style={{
-                              width: "fit-content",
                               background: "#FFFFFF",
                               cursor: "pointer",
                               padding: 5,
@@ -332,45 +286,52 @@ export function Product({ productImage, uploadImage, createProduct }) {
                       );
                     })}
                   </div>
-                </div>
-              </div>
-            </CardBody>
+                </Col>
+              </Row>
+            </Card.Footer>
           </Card>
         </Col>
-        {/* Image select section */}
         <Col sm={4}>
           <Card className="card-body">
-            <CardHeader>Product information</CardHeader>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-              <div style={{ textAlign: "center" }}>
-                {image && (
-                  <img
-                    src={`http://localhost:5000${image}`}
+            <Card.Header>Media</Card.Header>
+            <Card.Body>
+              <Card.Body>
+                {image ? (
+                  <Card.Img
+                    src={prefixAPI + image}
                     alt="Uploaded"
-                    width="200"
-                    style={{}}
+                    height={300}
                   />
+                ) : (
+                  <>
+                    <Card.Img src={EmptyImage} alt="Empty" height={300} />
+                  </>
                 )}
-              </div>
-              <button
-                className="btn btn-success"
-                type="submit"
-                onClick={handleFormSubmit}
+              </Card.Body>
+            </Card.Body>
+            <Card.Footer>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
               >
-                Submit
-              </button>
-            </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="mb-3"
+                  onChange={handleImageChange}
+                />
+                <button
+                  className="btn btn-success"
+                  type="submit"
+                  onClick={handleFormSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+            </Card.Footer>
           </Card>
         </Col>
       </Row>
