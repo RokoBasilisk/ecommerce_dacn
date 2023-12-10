@@ -25,8 +25,9 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const waitingMessageMap = new Map();
 
-socketHandle(io);
+socketHandle(io, waitingMessageMap);
 
 app.use(cors());
 
@@ -41,6 +42,8 @@ app.use(
 );
 
 app.use((req, res, next) => {
+  console.log(waitingMessageMap.keys());
+  req.waitingMessageMap = waitingMessageMap;
   next();
 });
 

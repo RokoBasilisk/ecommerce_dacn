@@ -72,17 +72,37 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         user: { _id },
       },
     } of createdOrder.orderItems) {
-      if (!shopIdsList.includes(_id.toString())) {
-        shopIdsList.push(_id.toString());
+      const shopId = _id.toString();
+      const orderId = createdOrder._id.toString();
+      if (!shopIdsList.includes(shopId)) {
+        shopIdsList.push(shopId);
         sendMessageToQueue(
           exchangeNameEnum.NOTIFICATION,
-          routingKeyEnum.ADD_ORDER + "_" + _id.toString(),
-          createdOrder._id.toString(),
+          routingKeyEnum.ADD_ORDER + "_" + shopId,
+          orderId,
           JSON.stringify({
-            _id: createdOrder._id.toString(),
-            message: `You have new order ${createdOrder._id.toString()}`,
+            _id: orderId,
+            message: `You have new order ${orderId}`,
           })
         );
+        // Map<String, Map<String, Array>>
+        // shopId: String
+        // exchangeOrder: Map
+        // ExchangeType: String
+        // orderList: Array
+        const routingKey =
+          exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER;
+        const shopExchangeMap = req.waitingMessageMap.get(shopId);
+        const exchangeOrderArray = shopExchangeMap?.get(routingKey);
+
+        if (shopExchangeMap && exchangeOrderArray) {
+          exchangeOrderArray.push(orderId);
+          shopExchangeMap.set(shopId, exchangeOrderArray);
+        } else {
+          const typeMap = new Map();
+          typeMap.set(routingKey, [orderId]);
+          req.waitingMessageMap.set(shopId, typeMap);
+        }
       }
     }
 
