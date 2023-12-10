@@ -42,24 +42,23 @@ export const consumeMessagesFromQueue = async (
   routingKey,
   queueName,
   socket,
-  channel
+  channel,
+  isAutoClose = false
 ) => {
   try {
     // Assert the exchange and queue
     await channel.assertExchange(exchangeName, "direct", { durable: false });
     const assertQueue = await channel.assertQueue(queueName, {
-      exclusive: true,
+      durable: false,
     });
 
     // Bind the queue to the exchange with the routing key
     await channel.bindQueue(assertQueue.queue, exchangeName, routingKey);
-    console.log("bind queue with", exchangeName, routingKey);
     // Consume messages from the queue
     channel.consume(
       assertQueue.queue,
       async (message) => {
         if (message) {
-          console.log(assertQueue);
           console.log(`Received message: ${message.content.toString()}`);
           const _id = JSON.parse(message.content.toString())._id;
           // Process the message here

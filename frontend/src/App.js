@@ -61,77 +61,70 @@ function App({ userInfo, webSocket }) {
   ];
   useEffect(() => {
     if (userInfo) {
-      socket.connect();
-    }
-    return () => {
-      if (userInfo) {
-        socket.disconnect();
-        console.log("disconnect because re-render");
+      console.log(userInfo);
+      if (!socket.connected) {
+        socket.connect();
+        console.log("connect from disconnected");
       }
-    };
-  }, [userInfo]);
+      // Set up socket listeners and emit events
+      function onConnect() {
+        setIsConnected(true);
+        socket.emit("join", userInfo._id);
+        // Add other socket event listeners
+        socket.on(userInfo._id, onJoin);
+      }
 
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-      socket.emit("join", userInfo._id);
-      socket.on(userInfo._id, onJoin);
-    }
+      function onDisconnect() {
+        setIsConnected(false);
+        console.log("disconnect");
+      }
 
-    function onDisconnect() {
-      setIsConnected(false);
-      console.log("disconnect");
-    }
+      function onAddOrder(notification) {
+        toast.info(notification.message, {
+          className: "text-info",
+        });
+      }
 
-    function onAddOrder(notification) {
-      toast.info(notification.message, {
-        className: "text-info",
-      });
-    }
+      function onPayOrder(notification) {
+        toast(notification.message, {
+          className: "text-info",
+        });
+      }
 
-    function onPayOrder(notification) {
-      toast(notification.message, {
-        className: "text-info",
-      });
-    }
+      function onJoin() {
+        console.log("join room");
+        socket.emit(
+          exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER,
+          userInfo._id
+        );
+        socket.emit(
+          exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER,
+          userInfo._id
+        );
+        console.log("Notification listen...", userInfo._id);
+        socket.on(
+          exchangeNameEnum.NOTIFICATION +
+            "_" +
+            routingKeyEnum.ADD_ORDER +
+            "_" +
+            userInfo._id,
+          onAddOrder
+        );
+        socket.on(
+          exchangeNameEnum.NOTIFICATION +
+            "_" +
+            routingKeyEnum.PAY_ORDER +
+            "_" +
+            userInfo._id,
+          onPayOrder
+        );
+      }
 
-    function onJoin() {
-      console.log("join room");
-      socket.emit(
-        exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER,
-        userInfo._id
-      );
-      socket.emit(
-        exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER,
-        userInfo._id
-      );
-      console.log("Notification listen...", userInfo._id);
-      socket.on(
-        exchangeNameEnum.NOTIFICATION +
-          "_" +
-          routingKeyEnum.ADD_ORDER +
-          "_" +
-          userInfo._id,
-        onAddOrder
-      );
-      socket.on(
-        exchangeNameEnum.NOTIFICATION +
-          "_" +
-          routingKeyEnum.PAY_ORDER +
-          "_" +
-          userInfo._id,
-        onPayOrder
-      );
-    }
-    if (userInfo) {
       socket.on("connect", onConnect);
       socket.on("disconnect", onDisconnect);
-    }
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      if (userInfo) {
+      return () => {
+        socket.off("connect", onConnect);
+        socket.off("disconnect", onDisconnect);
         socket.off(userInfo._id);
         socket.off(
           exchangeNameEnum.NOTIFICATION +
@@ -147,8 +140,15 @@ function App({ userInfo, webSocket }) {
             "_" +
             userInfo._id
         );
+        socket.disconnect(); // Disconnect on component unmount or userInfo change
+        console.log(userInfo, "disconnected");
+      };
+    } else {
+      if (socket.connected) {
+        socket.disconnect();
+        console.log(userInfo, "disconnected from connected");
       }
-    };
+    }
   }, [userInfo]);
 
   return (

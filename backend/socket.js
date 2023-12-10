@@ -3,11 +3,40 @@ import amqp from "amqplib";
 import { consumeMessagesFromQueue } from "./utils/amqpHandle.js";
 import { exchangeNameEnum, routingKeyEnum } from "./constanst/AmqpEnum.js";
 
-const onJoin = (userId, socket, connectedUsers) => {
+const onJoin = (userId, socket, connectedUsers, channel, waitingMessageMap) => {
   if (!connectedUsers.get(userId)) {
     connectedUsers.set(userId, socket.id);
     console.log(`${userId} connect to server`);
     socket.emit(userId);
+    onWaitingOrder(userId, socket, channel, waitingMessageMap);
+  }
+};
+
+const onWaitingOrder = async (userId, socket, channel, waitingMessageMap) => {
+  const shopExchangeMap = waitingMessageMap.get(userId);
+  let routingKey;
+  for (let exchangeKey of Object.keys(routingKeyEnum)) {
+    routingKey = exchangeNameEnum.NOTIFICATION + "_" + exchangeKey;
+    const exchangeOrderArray = shopExchangeMap?.get(routingKey);
+    if (shopExchangeMap && exchangeOrderArray) {
+      for (let orderId of exchangeOrderArray) {
+        await consumeMessagesFromQueue(
+          exchangeNameEnum.NOTIFICATION,
+          exchangeKey + "_" + userId,
+          orderId,
+          socket,
+          channel
+        );
+        const excludeExchangeOrderArray = exchangeOrderArray.filter(
+          (e) => orderId !== e
+        );
+        if (excludeExchangeOrderArray.length != 0) {
+          shopExchangeMap.delete(routingKey);
+        } else {
+          shopExchangeMap.set(routingKey, exchangeOrderArray);
+        }
+      }
+    }
   }
 };
 
@@ -65,12 +94,14 @@ const onDisconnected = (channel, connection, socket, connectedUsers) => {
   }
 };
 
-export const socketHandle = (io) => {
+export const socketHandle = (io, waitingMessageMap) => {
   const connectedUsers = new Map();
   io.on("connection", async (socket) => {
     const connection = await amqp.connect(process.env.AMQP_URI);
     const channel = await connection.createChannel();
-    socket.on("join", (userId) => onJoin(userId, socket, connectedUsers));
+    socket.on("join", (userId) =>
+      onJoin(userId, socket, connectedUsers, channel, waitingMessageMap)
+    );
     socket.on(
       exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER,
       (userId) => onAddOrder(userId, socket, channel, connectedUsers)
