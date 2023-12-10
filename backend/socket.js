@@ -78,6 +78,11 @@ const onUpdateOrder = (userId, socket, channel, connectedUsers) => {
   }
 };
 
+const onHistoryOrder = (userId, socket, channel, connectedUsers) => {
+  if (connectedUsers.has(userId)) {
+  }
+};
+
 const onDisconnected = (channel, connection, socket, connectedUsers) => {
   for (let [key, value] of connectedUsers.entries()) {
     if (socket.id === value) {
@@ -114,6 +119,11 @@ export const socketHandle = (io, waitingMessageMap) => {
     socket.on(
       exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.UPDATE_ORDER,
       async (userId) => onUpdateOrder(userId, socket, channel, connectedUsers)
+    );
+
+    socket.on(
+      exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.HISTORY_ORDER,
+      async (userId) => onHistoryOrder(userId, socket, channel, connectedUsers)
     );
 
     socket.on("disconnect", async () =>

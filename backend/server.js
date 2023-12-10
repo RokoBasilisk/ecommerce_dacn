@@ -36,6 +36,8 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use(morgan("tiny"));
+
 app.use(
   "/api/docs",
   swaggerUi.serve,
@@ -60,6 +62,12 @@ app.use("/api/config/paypal", (req, res) =>
     secretKey: process.env.PAYPAL_CLIENT_SECRET,
   })
 );
+app.use("/api/payment/success", (req, res) => {
+  res.json({success: true});
+})
+app.use("/api/payment/failed", (req, res) => {
+  res.json({success: failed});
+})
 
 const __dirname = path.resolve(); // Not avaliable because its using ESM
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));

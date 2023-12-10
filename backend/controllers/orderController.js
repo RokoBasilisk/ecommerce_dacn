@@ -18,9 +18,9 @@ const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 // @route POST /api/orders
 // @access Private
 export const addOrderItems = asyncHandler(async (req, res) => {
-  const { products, shippingAddress, paymentMethod } = req.body;
   let orderItems = [];
   let itemsPrice = 0;
+  const { products, shippingAddress, paymentMethod } = req.body;
 
   // Validate products
   if (products && products.length === 0) {
