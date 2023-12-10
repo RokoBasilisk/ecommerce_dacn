@@ -7,14 +7,9 @@ import CreateFormInput from "../components/atoms/CreateFormInput";
 import Meta from "../components/atoms/Meta";
 import axios from "axios";
 import { prefixAPI } from "../types";
+import { Card, CardBody, CardHeader, Col, Form, Row } from "react-bootstrap";
 
-export function Product({
-  match,
-  history,
-  productImage,
-  uploadImage,
-  createProduct,
-}) {
+export function Product({ productImage, uploadImage, createProduct }) {
   const validateMessageEnums = {
     FIELD_REQUIRED: (validateField) =>
       `Please fill required *${validateField}*`,
@@ -146,172 +141,239 @@ export function Product({
   return (
     <>
       <Meta title="Create Product" />
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <CreateFormInput
-            name="name"
-            value={dataForm.name}
-            isHolder={true}
-            onChange={handleDataChange}
-          />
-          <CreateFormInput
-            name="description"
-            value={dataForm.description}
-            isHolder={true}
-            onChange={handleDataChange}
-          />
-          <CreateFormInput
-            name="unitPrice"
-            type="text"
-            value={dataForm.unitPrice}
-            onChange={handleDataChange}
-          />
-          <CreateFormInput
-            name="countInStock"
-            type="text"
-            pattern="[0-9]*"
-            value={dataForm.countInStock}
-            onChange={handleDataChange}
-          />
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "200px 1fr",
-              gap: "10px",
-            }}
-          >
-            <select
-              multiple
-              size={categories.length} // Adjust as needed
-              style={{
-                width: "200px",
-                height: "200px",
-                userSelect: "none",
-                overflowY: "hidden",
-              }} // Adjust container width
-              name="category"
-              value={dataForm.category}
-              onChange={() => {
-                // do nothing
-              }}
-            >
-              {categories.length != 0 &&
-                categories.map(({ _id, categoryName, categoryIcon }, index) => {
-                  const categoryHash =
-                    categoryName + "|" + categoryIcon + "|" + _id;
-                  return (
-                    <option
-                      key={_id}
-                      value={categoryHash}
-                      style={{
-                        background: dataForm.category.includes(categoryHash)
-                          ? "lightblue"
-                          : "",
-                      }}
-                      onClick={() => {
-                        handleCategorySelect({
-                          target: {
-                            value: categoryHash,
-                          },
-                        });
-                      }}
+      <Row>
+        <Col sm={8}>
+          <Card className="card-body">
+            <CardHeader>Product Information</CardHeader>
+            <CardBody>
+              <Col>
+                <Row>
+                  <CreateFormInput
+                    name="name"
+                    value={dataForm.name}
+                    isHolder={true}
+                    onChange={handleDataChange}
+                  />
+                </Row>
+                <Row>
+                  <CreateFormInput
+                    name="description"
+                    value={dataForm.description}
+                    isHolder={true}
+                    onChange={handleDataChange}
+                  />
+                </Row>
+                <Row>
+                  {" "}
+                  <CreateFormInput
+                    name="unitPrice"
+                    type="text"
+                    value={dataForm.unitPrice}
+                    onChange={handleDataChange}
+                  />
+                </Row>
+                <Row>
+                  <CreateFormInput
+                    name="countInStock"
+                    type="text"
+                    pattern="[0-9]*"
+                    value={dataForm.countInStock}
+                    onChange={handleDataChange}
+                  />
+                </Row>
+              </Col>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "200px 1fr",
+                    gap: "10px",
+                  }}
+                >
+                  <Col className="overflow-hidden">
+                    <Form.Select
+                      style={{ overflowY: "scroll" }}
+                      aria-label="Default select example"
+                      multiple
                     >
-                      {categoryName}
-                    </option>
-                  );
-                })}
-            </select>
+                      {categories.length != 0 &&
+                        categories.map(
+                          ({ _id, categoryName, categoryIcon }, index) => {
+                            const categoryHash =
+                              categoryName + "|" + categoryIcon + "|" + _id;
+                            return (
+                              <option
+                                key={_id}
+                                value={categoryHash}
+                                style={{
+                                  background: dataForm.category.includes(
+                                    categoryHash
+                                  )
+                                    ? "lightblue"
+                                    : "",
+                                }}
+                                onClick={() => {
+                                  handleCategorySelect({
+                                    target: {
+                                      value: categoryHash,
+                                    },
+                                  });
+                                }}
+                              >
+                                {categoryName}
+                              </option>
+                            );
+                          }
+                        )}
+                    </Form.Select>
+                  </Col>
+                  {/* <select
+                    multiple
+                    size={categories.length} // Adjust as needed
+                    style={{
+                      width: "200px",
+                      height: "200px",
+                      userSelect: "none",
+                      overflowY: "hidden",
+                    }} // Adjust container width
+                    name="category"
+                    value={dataForm.category}
+                    onChange={() => {
+                      // do nothing
+                    }}
+                  >
+                    {categories.length != 0 &&
+                      categories.map(
+                        ({ _id, categoryName, categoryIcon }, index) => {
+                          const categoryHash =
+                            categoryName + "|" + categoryIcon + "|" + _id;
+                          return (
+                            <option
+                              key={_id}
+                              value={categoryHash}
+                              style={{
+                                background: dataForm.category.includes(
+                                  categoryHash
+                                )
+                                  ? "lightblue"
+                                  : "",
+                              }}
+                              onClick={() => {
+                                handleCategorySelect({
+                                  target: {
+                                    value: categoryHash,
+                                  },
+                                });
+                              }}
+                            >
+                              {categoryName}
+                            </option>
+                          );
+                        }
+                      )}
+                  </select> */}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      width: "1fr",
+                      alignContent: "flex-start",
+                      overflowY: "scroll",
+                      gap: "0 10px",
+                    }}
+                  >
+                    {dataForm.category.map((category, index) => {
+                      // category = categoryName|categoryIcon|_id
+                      const splitCategory = category.split("|");
+                      return (
+                        <div
+                          key={splitCategory[2]}
+                          style={{
+                            marginBottom: "5px",
+                            marginTop: "5px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "fit-content",
+                              background: "#FFFFFF",
+                              cursor: "pointer",
+                              padding: 5,
+                              border: "3px solid #f8e3ae",
+                              borderRadius: "0.5rem",
+                            }}
+                            onClick={() => {
+                              handleCategorySelect({
+                                target: {
+                                  value:
+                                    splitCategory[0] +
+                                    "|" +
+                                    splitCategory[1] +
+                                    "|" +
+                                    splitCategory[2],
+                                },
+                              });
+                            }}
+                          >
+                            <img
+                              width={30}
+                              height={30}
+                              src={prefixAPI + splitCategory[1]}
+                              style={{ marginRight: "10px" }}
+                            />
+                            <span>{splitCategory[0]}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        </Col>
+        {/* Image select section */}
+        <Col sm={4}>
+          <Card className="card-body">
+            <CardHeader>Product information</CardHeader>
             <div
               style={{
                 display: "flex",
-                flexWrap: "wrap",
-                width: "1fr",
-                alignContent: "flex-start",
-                overflowY: "scroll",
-                gap: "0 10px",
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
-              {dataForm.category.map((category, index) => {
-                // category = categoryName|categoryIcon|_id
-                const splitCategory = category.split("|");
-                return (
-                  <div
-                    key={splitCategory[2]}
-                    style={{
-                      marginBottom: "5px",
-                      marginTop: "5px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "fit-content",
-                        background: "#FFFFFF",
-                        cursor: "pointer",
-                        padding: 5,
-                        border: "3px solid #f8e3ae",
-                        borderRadius: "0.5rem",
-                      }}
-                      onClick={() => {
-                        handleCategorySelect({
-                          target: {
-                            value:
-                              splitCategory[0] +
-                              "|" +
-                              splitCategory[1] +
-                              "|" +
-                              splitCategory[2],
-                          },
-                        });
-                      }}
-                    >
-                      <img
-                        width={30}
-                        height={30}
-                        src={prefixAPI + splitCategory[1]}
-                        style={{ marginRight: "10px" }}
-                      />
-                      <span>{splitCategory[0]}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-        {/* Image select section */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          <div style={{ textAlign: "center" }}>
-            {image && (
-              <img
-                src={`http://localhost:5000${image}`}
-                alt="Uploaded"
-                width="200"
-                style={{}}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
               />
-            )}
-          </div>
-          <button
-            className="btn btn-success"
-            type="submit"
-            onClick={handleFormSubmit}
-          >
-            Submit
-          </button>
-        </div>
-      </div>
+              <div style={{ textAlign: "center" }}>
+                {image && (
+                  <img
+                    src={`http://localhost:5000${image}`}
+                    alt="Uploaded"
+                    width="200"
+                    style={{}}
+                  />
+                )}
+              </div>
+              <button
+                className="btn btn-success"
+                type="submit"
+                onClick={handleFormSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 }
