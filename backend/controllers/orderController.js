@@ -231,6 +231,19 @@ export const payoutForShop = asyncHandler(async (req, res) => {
           })
         );
       }
+      const routingKey =
+        exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER;
+      const shopExchangeMap = req.waitingMessageMap.get(shopId);
+      const exchangeOrderArray = shopExchangeMap?.get(routingKey);
+
+      if (shopExchangeMap && exchangeOrderArray) {
+        exchangeOrderArray.push(orderId);
+        shopExchangeMap.set(shopId, exchangeOrderArray);
+      } else {
+        const typeMap = new Map();
+        typeMap.set(routingKey, [orderId]);
+        req.waitingMessageMap.set(shopId, typeMap);
+      }
       res.status(SUCCESS_HTTP_STATUS);
       return res.json({ success: true });
     })

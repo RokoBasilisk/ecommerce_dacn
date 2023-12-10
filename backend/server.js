@@ -6,6 +6,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
+import morgan from "morgan";
 
 import { basicInfo } from "./docs/basicInfo.js";
 import connectDB from "./config/db.js";
@@ -29,6 +30,8 @@ const waitingMessageMap = new Map();
 
 socketHandle(io, waitingMessageMap);
 
+app.use(morgan("short"));
+
 app.use(cors());
 
 app.use(express.json());
@@ -42,7 +45,6 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  console.log(waitingMessageMap.keys());
   req.waitingMessageMap = waitingMessageMap;
   next();
 });
@@ -52,8 +54,11 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use("/api/config/paypal", protect, isCustomer, (req, res) =>
-  res.send(process.env.PAYPAL_CLIENT_ID)
+app.use("/api/config/paypal", (req, res) =>
+  res.json({
+    clientId: process.env.PAYPAL_CLIENT_ID,
+    secretKey: process.env.PAYPAL_CLIENT_SECRET,
+  })
 );
 
 const __dirname = path.resolve(); // Not avaliable because its using ESM
