@@ -10,6 +10,7 @@ import {
   FAIL_HTTP_STATUS,
   SUCCESS_HTTP_STATUS,
 } from "../constanst/ResultResponse.js";
+import eventRepository from "../repository/eventRepository.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -151,6 +152,12 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
     }
     object.isDeleted = true;
     await object.save();
+    await eventRepository.add({
+      eventTargetId: req.user._id,
+      eventName: deleteProductAdmin.name,
+      eventContext: `Delete Product ${object.name} by ${req.user.name}`,
+      aggregateData: JSON.stringify(object),
+    });
     res.status(SUCCESS_HTTP_STATUS);
     res.json({ message: "Product removed" });
   } else {
@@ -197,6 +204,12 @@ export const createProductAdmin = asyncHandler(async (req, res) => {
     isDeleted: false,
   });
   const createdObj = await object.save();
+  await eventRepository.add({
+    eventTargetId: req.user._id,
+    eventName: createProductAdmin.name,
+    eventContext: `Create Product ${createdObj.name} by ${req.user.name}`,
+    aggregateData: JSON.stringify(createdObj),
+  });
   res.status(SUCCESS_HTTP_STATUS);
   res.json(createdObj);
 });
@@ -215,6 +228,12 @@ export const updateProductAdmin = asyncHandler(async (req, res) => {
     object.countInStock += sanitize(req.body.countInStock);
 
     const updatedObj = await object.save();
+    await eventRepository.add({
+      eventTargetId: req.user._id,
+      eventName: updateProductAdmin.name,
+      eventContext: `Update Product ${object.name} by ${req.user.name}`,
+      aggregateData: JSON.stringify(object),
+    });
     res.status(SUCCESS_HTTP_STATUS);
     res.json(updatedObj);
   } else {

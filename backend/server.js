@@ -15,6 +15,7 @@ import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import { isCustomer, protect } from "./middleware/authMiddleware.js";
 import { socketHandle } from "./socket.js";
@@ -54,6 +55,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/config/paypal", (req, res) =>
   res.json({
     clientId: process.env.PAYPAL_CLIENT_ID,
