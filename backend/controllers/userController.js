@@ -33,6 +33,9 @@ export const authUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     avatarUrl: user.avatarUrl,
+    paypalEmail: user.paypalEmail,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
     token: generateToken(user.id),
   };
   if (user.isShop) {
