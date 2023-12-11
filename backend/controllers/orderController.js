@@ -53,6 +53,12 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     });
 
     const createdOrder = await order.save();
+    await eventRepository.add({
+      eventTargetId: req.user._id,
+      eventName: addOrderItems.name,
+      eventContext: `Add Order ${createdOrder._id} by ${req.user.name}`,
+      aggregateData: JSON.stringify(createdOrder),
+    });
     await createdOrder
       .populate({
         path: "orderItems",
@@ -209,7 +215,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
 
   axios
     .post(apiUrl, jsonPayload, { headers })
-    .then((response) => {
+    .then(async (response) => {
       const date = new Date();
       const paymentResult = {
         payout_batch_id: response.data.batch_header.payout_batch_id,
@@ -221,6 +227,12 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       order.paidAt = date;
       order.save();
       for (let _id of Object.keys(sellerMoney)) {
+        await eventRepository.add({
+          eventTargetId: _id,
+          eventName: payoutForShop.name,
+          eventContext: `Transfer money by ${req.user.name}`,
+          aggregateData: JSON.stringify(order),
+        });
         sendMessageToQueue(
           exchangeNameEnum.NOTIFICATION,
           routingKeyEnum.PAY_ORDER + "_" + _id.toString(),
@@ -377,6 +389,13 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
   order.deliveredAt = Date.now();
 
   const updatedOrder = await order.save();
+
+  await eventRepository.add({
+    eventTargetId: req.user._id,
+    eventName: putUpdateOrderToDelivered.name,
+    eventContext: `Update Deliver Order by ${req.user.name}`,
+    aggregateData: JSON.stringify(updatedOrder),
+  });
 
   sendMessageToQueue(
     exchangeNameEnum.NOTIFICATION,
