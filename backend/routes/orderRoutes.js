@@ -18,7 +18,7 @@ router
 
 router.route("/myorders").get(protect, isCustomer, getOrderUserOrders);
 
-router.route("/:orderId/payout").post(protect, isCustomer, payoutForShop);
+router.route("/:orderId/payout").patch(protect, isCustomer, payoutForShop);
 
 router.route("/:id/deliver").put(protect, isShop, putUpdateOrderToDelivered);
 
