@@ -55,7 +55,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     const createdOrder = await order.save();
     await eventRepository.add({
       eventTargetId: req.user._id,
-      eventName: addOrderItems.name,
+      eventName: "addOrderItems",
       eventContext: `Add Order ${createdOrder._id} by ${req.user.name}`,
       aggregateData: JSON.stringify(createdOrder),
     });
@@ -229,7 +229,7 @@ export const payoutForShop = asyncHandler(async (req, res) => {
       for (let _id of Object.keys(sellerMoney)) {
         await eventRepository.add({
           eventTargetId: _id,
-          eventName: payoutForShop.name,
+          eventName: "payoutForShop",
           eventContext: `Transfer money by ${req.user.name}`,
           aggregateData: JSON.stringify(order),
         });
@@ -392,7 +392,7 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
 
   await eventRepository.add({
     eventTargetId: req.user._id,
-    eventName: putUpdateOrderToDelivered.name,
+    eventName: "putUpdateOrderToDelivered",
     eventContext: `Update Deliver Order by ${req.user.name}`,
     aggregateData: JSON.stringify(updatedOrder),
   });

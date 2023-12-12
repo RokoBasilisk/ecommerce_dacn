@@ -154,7 +154,7 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
     await object.save();
     await eventRepository.add({
       eventTargetId: req.user._id,
-      eventName: deleteProductAdmin.name,
+      eventName: "deleteProductAdmin",
       eventContext: `Delete Product ${object.name} by ${req.user.name}`,
       aggregateData: JSON.stringify(object),
     });
@@ -206,7 +206,7 @@ export const createProductAdmin = asyncHandler(async (req, res) => {
   const createdObj = await object.save();
   await eventRepository.add({
     eventTargetId: req.user._id,
-    eventName: createProductAdmin.name,
+    eventName: "createProductAdmin",
     eventContext: `Create Product ${createdObj.name} by ${req.user.name}`,
     aggregateData: JSON.stringify(createdObj),
   });
@@ -230,7 +230,7 @@ export const updateProductAdmin = asyncHandler(async (req, res) => {
     const updatedObj = await object.save();
     await eventRepository.add({
       eventTargetId: req.user._id,
-      eventName: updateProductAdmin.name,
+      eventName: "updateProductAdmin",
       eventContext: `Update Product ${object.name} by ${req.user.name}`,
       aggregateData: JSON.stringify(object),
     });
