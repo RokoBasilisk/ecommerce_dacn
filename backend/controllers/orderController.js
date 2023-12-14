@@ -11,6 +11,7 @@ import {
 } from "../constanst/ResultResponse.js";
 import { sendMessageToQueue } from "../utils/amqpHandle.js";
 import { exchangeNameEnum, routingKeyEnum } from "../constanst/AmqpEnum.js";
+import eventRepository from "../repository/eventRepository.js";
 
 const apiUrl = "https://api-m.sandbox.paypal.com/v1/payments/payouts";
 
