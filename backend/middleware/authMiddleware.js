@@ -27,6 +27,7 @@ export const protect = asyncHandler(async (req, res, next) => {
 
 export const isShop = (req, res, next) => {
   // req.user is passed by protect middleware
+  console.log(req.user);
   if (req.user && req.user.isShop) {
     next();
   } else {
