@@ -171,11 +171,9 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
 // @access Private
 export const createProductAdmin = asyncHandler(async (req, res) => {
   let image = req.body.image;
-  console.log(image);
   if (!image) {
     image = "/uploads/defaultProduct.png";
   }
-  console.log(image + "2");
   const object = new ProductModel({
     user: req.user._id,
     name: sanitize(req.body.name),
