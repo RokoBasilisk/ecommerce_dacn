@@ -171,29 +171,14 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
 // @access Private
 export const createProductAdmin = asyncHandler(async (req, res) => {
   let image = req.body.image;
-
-  if (image) {
-    try {
-      await fs.promises.access(
-        `${__dirname.replace("\\controllers", "")}${image}`,
-        fs.constants.F_OK,
-        (err) => {
-          console.log(err);
-        }
-      );
-    } catch (error) {
-      res.status(FAIL_HTTP_STATUS);
-      throw new Error("Image URL is not correct");
-    }
-  } else {
+  if (!image) {
     image = "/uploads/defaultProduct.png";
   }
-
   const object = new ProductModel({
     user: req.user._id,
     name: sanitize(req.body.name),
     image: sanitize(image),
-    category: sanitize(req.body.category),
+    category: req.body.category,
     description: sanitize(req.body.description),
     reviews: [],
     ratingSum: 0,
