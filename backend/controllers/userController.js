@@ -117,18 +117,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
-  if (avatarUrl) {
-    try {
-      await fs.promises.access(
-        `${__dirname.replace("\\controllers", "")}${avatarUrl}`,
-        fs.constants.F_OK,
-        (err) => {}
-      );
-    } catch (error) {
-      res.status(FAIL_HTTP_STATUS);
-      throw new Error("Avatar URL is not correct");
-    }
-  } else {
+  if (!avatarUrl) {
     avatarUrl = "/uploads/defaultAvatar.png";
   }
 
