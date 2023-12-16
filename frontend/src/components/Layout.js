@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { io } from "socket.io-client";
 
 import { listCategoriesNames } from "../actions/shopActions";
 import { logout } from "../actions/userAction";

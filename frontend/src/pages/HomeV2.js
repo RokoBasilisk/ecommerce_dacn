@@ -1,45 +1,93 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { useHistory } from "react-router";
+import { useLocation } from "react-router";
+import { Link } from "react-router-dom";
+import {
+  Sidebar,
+  Menu,
+  MenuItem,
+  SubMenu,
+  menuClasses,
+} from "react-pro-sidebar";
 
 import AsideBar from "../components/organisms/Sidebar";
-import { Container } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
+
+const sideItemList = [
+  {
+    path: "/",
+    content: "DashBoard",
+    icon: <i className="nav-icon fas fa-home"></i>,
+  },
+  {
+    path: "/products",
+    content: "Product List",
+    icon: <i className="nav-icon fas fa-store"></i>,
+  },
+  {
+    path: "/orders",
+    content: "Order List",
+    icon: <i className="nav-icon fas fa-shopping-cart"></i>,
+  },
+  {
+    path: "/profile",
+    content: "Profile",
+    icon: <i className="nav-icon fas fa-id-card"></i>,
+  },
+];
 
 export const HomeV2 = ({ children }) => {
-  let history = useHistory();
-
+  let { pathname } = useLocation();
+  let routeNameMapping;
   return (
     <>
-      <div className="wrapper">
+      <div className="wrapper d-flex">
         {/* Main Sidebar Container */}
-        <AsideBar history={history} />
+        {/* <AsideBar history={history} /> */}
+        <Sidebar>
+          <Menu
+            menuItemStyles={{
+              button: {
+                // the active class will be added automatically by react router
+                // so we can use it to style the active menu item
+                [`&.ps-active`]: {
+                  backgroundColor: "#13395e",
+                  color: "#b6c8d9",
+                },
+              },
+            }}
+          >
+            {/* <SubMenu
+              icon={<i className="nav-icon fas fa-home" />}
+              label="Charts"
+            >
+              <MenuItem>Pie charts </MenuItem>
+              <MenuItem> Line charts </MenuItem>
+            </SubMenu>
+            <MenuItem> Documentation </MenuItem>
+            <MenuItem> Calendar </MenuItem> */}
+            {sideItemList.map(({ path, content, icon }) => (
+              <MenuItem
+                active={pathname === path}
+                component={<Link to={path} />}
+                icon={icon}
+                key={path}
+              >
+                {content}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Sidebar>
         {/* Content Wrapper. Contains page content */}
-        <div className="content-wrapper">
-          {/* Content Header (Page header) */}
-          <div className="content-header">
-            <div className="container-fluid">
-              <div className="row mb-2">
-                <div className="col-sm-6">
-                  {/* <h1 className="m-0">Home Page</h1> */}
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /.content-header */}
+        {/* /.content-header */}
 
-          {/* Main content */}
-          <section className="content">
-            <Container fluid>{children}</Container>
-          </section>
-          {/* /.content */}
-        </div>
-        {/* /.content-wrapper */}
-
-        {/* Main Footer */}
-        <footer className="main-footer">
-          <strong>Footer Content</strong>
-        </footer>
+        {/* Main content */}
+        <Container fluid className="mt-2">
+          {children}
+        </Container>
+        {/* /.content */}
       </div>
+      {/* /.content-wrapper */}
     </>
   );
 };

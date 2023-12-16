@@ -60,12 +60,12 @@ export default function StoreHeader({
               </LogoImg>
             </NavCol>
             <NavCol align="flex-end">
-              <NavMouseOver id="cart" onClick={() => history.push("/cart")}>
+              {/* <NavMouseOver id="cart" onClick={() => history.push("/cart")}>
                 <FaShoppingCart size="32" />
                 <NavDropDown cart onClick={(e) => e.stopPropagation()}>
                   <Cart items={itemsOnCart} />
                 </NavDropDown>
-              </NavMouseOver>
+              </NavMouseOver> */}
               <NavMouseOver id="user" onClick={() => history.push("/profile")}>
                 <FaUser size="32" />
                 <NavDropDown onClick={(e) => e.stopPropagation()}>

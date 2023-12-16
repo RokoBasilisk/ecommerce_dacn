@@ -9,22 +9,20 @@ import Register from "./pages/Register";
 import Order from "./pages/Order";
 import MissingPage from "./pages/MissingPage";
 import Layout from "./components/Layout";
+import Profile from "./pages/Profile";
 
 import Protect from "./security/ProtectedRoute";
 import HomeV2 from "./pages/HomeV2";
 import DashBoard from "./pages/DashBoard";
 import Products from "./pages/Products";
 import QuantityModal from "./components/atoms/Modal";
-import { exchangeNameEnum, prefixAPI, routingKeyEnum } from "./types";
-import { socket } from "./socket";
 
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/plugins/fontawesome-free/css/all.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
 import "react-toastify/dist/ReactToastify.css";
-function App({ userInfo, webSocket }) {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+function App({ userInfo }) {
   const routeRender = [
     {
       path: "/register",
@@ -50,6 +48,11 @@ function App({ userInfo, webSocket }) {
       isPrivate: true,
     },
     {
+      path: "/profile",
+      component: <Profile />,
+      isPrivate: true,
+    },
+    {
       path: "/",
       component: <DashBoard />,
       isPrivate: true,
@@ -59,97 +62,6 @@ function App({ userInfo, webSocket }) {
       component: <MissingPage />,
     },
   ];
-  useEffect(() => {
-    if (userInfo) {
-      console.log(userInfo);
-      if (!socket.connected) {
-        socket.connect();
-        console.log("connect from disconnected");
-      }
-      // Set up socket listeners and emit events
-      function onConnect() {
-        setIsConnected(true);
-        socket.emit("join", userInfo._id);
-        // Add other socket event listeners
-        socket.on(userInfo._id, onJoin);
-      }
-
-      function onDisconnect() {
-        setIsConnected(false);
-        console.log("disconnect");
-      }
-
-      function onAddOrder(notification) {
-        toast.info(notification.message, {
-          className: "text-info",
-        });
-      }
-
-      function onPayOrder(notification) {
-        toast(notification.message, {
-          className: "text-info",
-        });
-      }
-
-      function onJoin() {
-        console.log("join room");
-        socket.emit(
-          exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.ADD_ORDER,
-          userInfo._id
-        );
-        socket.emit(
-          exchangeNameEnum.NOTIFICATION + "_" + routingKeyEnum.PAY_ORDER,
-          userInfo._id
-        );
-        console.log("Notification listen...", userInfo._id);
-        socket.on(
-          exchangeNameEnum.NOTIFICATION +
-            "_" +
-            routingKeyEnum.ADD_ORDER +
-            "_" +
-            userInfo._id,
-          onAddOrder
-        );
-        socket.on(
-          exchangeNameEnum.NOTIFICATION +
-            "_" +
-            routingKeyEnum.PAY_ORDER +
-            "_" +
-            userInfo._id,
-          onPayOrder
-        );
-      }
-
-      socket.on("connect", onConnect);
-      socket.on("disconnect", onDisconnect);
-      return () => {
-        socket.off("connect", onConnect);
-        socket.off("disconnect", onDisconnect);
-        socket.off(userInfo._id);
-        socket.off(
-          exchangeNameEnum.NOTIFICATION +
-            "_" +
-            routingKeyEnum.ADD_ORDER +
-            "_" +
-            userInfo._id
-        );
-        socket.off(
-          exchangeNameEnum.NOTIFICATION +
-            "_" +
-            routingKeyEnum.PAY_ORDER +
-            "_" +
-            userInfo._id
-        );
-        socket.disconnect(); // Disconnect on component unmount or userInfo change
-        console.log(userInfo, "disconnected");
-      };
-    } else {
-      if (socket.connected) {
-        socket.disconnect();
-        console.log(userInfo, "disconnected from connected");
-      }
-    }
-  }, [userInfo]);
 
   return (
     <BrowserRouter>
@@ -195,7 +107,6 @@ function App({ userInfo, webSocket }) {
 
 const mapStateToProps = (state) => ({
   userInfo: state.userLogin.userInfo,
-  webSocket: state.userLogin.webSocket,
 });
 
 const mapDispatchToProps = {};

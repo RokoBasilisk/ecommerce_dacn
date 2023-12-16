@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { Card, CardBody, CardHeader, Col, Form, Row } from "react-bootstrap";
 
@@ -30,6 +30,14 @@ export function Product({ productImage, uploadImage, createProduct }) {
   });
 
   const { loading, image, error } = productImage;
+
+  const fileInputRef = useRef(null);
+
+  const handleCardImgClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger the file input click event
+    }
+  };
 
   const [categories, setCategories] = useState([]);
 
@@ -80,6 +88,7 @@ export function Product({ productImage, uploadImage, createProduct }) {
   };
 
   const handleImageChange = (e) => {
+    console.log(e.target.files[0]);
     const file = e.target.files[0];
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
     if (file) {
@@ -106,8 +115,13 @@ export function Product({ productImage, uploadImage, createProduct }) {
     e.preventDefault();
 
     const blankValidateFields = ["name", "description", "image", "category"];
+    const categoryList = [];
+    for (let category of dataForm.category) {
+      categoryList.push(category.split("|")[0]);
+    }
     const publishDataForm = {
       ...dataForm,
+      category: categoryList,
       image,
     };
 
@@ -301,12 +315,26 @@ export function Product({ productImage, uploadImage, createProduct }) {
                     src={prefixAPI + image}
                     alt="Uploaded"
                     height={300}
+                    onClick={handleCardImgClick}
                   />
                 ) : (
                   <>
-                    <Card.Img src={EmptyImage} alt="Empty" height={300} />
+                    <Card.Img
+                      src={EmptyImage}
+                      alt="Empty"
+                      height={300}
+                      onClick={handleCardImgClick}
+                    />
                   </>
                 )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="mb-3"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
               </Card.Body>
             </Card.Body>
             <Card.Footer>
@@ -317,12 +345,6 @@ export function Product({ productImage, uploadImage, createProduct }) {
                   justifyContent: "center",
                 }}
               >
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="mb-3"
-                  onChange={handleImageChange}
-                />
                 <button
                   className="btn btn-success"
                   type="submit"

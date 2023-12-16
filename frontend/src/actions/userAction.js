@@ -1,3 +1,4 @@
+import { Toast } from "react-bootstrap";
 import {
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
@@ -22,6 +23,7 @@ import {
   prefixAPI,
 } from "../types";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export const login = (email, password) => async (dispatch) => {
   try {
@@ -89,7 +91,6 @@ export const register = (name, email, password, paypalEmail) => async (
 
     dispatch({ type: USER_REGISTER_SUCCESS });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
-
     localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
@@ -102,7 +103,7 @@ export const register = (name, email, password, paypalEmail) => async (
   }
 };
 
-export const updateUserProfile = (user) => async (dispatch, getState) => {
+export const updateUserProfile = (formData) => async (dispatch, getState) => {
   try {
     dispatch({
       type: USER_UPDATE_PROFILE_REQUEST,
@@ -115,11 +116,12 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     };
     const { data } = await axios.patch(
       `${prefixAPI}/api/users/profile`,
-      user,
+      formData,
       config
     );
     dispatch({ type: USER_UPDATE_PROFILE_SUCCESS, payload: data });
     localStorage.setItem("userInfo", JSON.stringify(data));
+    return true;
   } catch (error) {
     dispatch({
       type: USER_UPDATE_PROFILE_FAIL,

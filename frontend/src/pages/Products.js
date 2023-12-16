@@ -150,7 +150,7 @@ export function Products({
               <Table bordered hover responsive>
                 {renderTableHeaders()}
                 {renderTableRows()}
-                {products.length === 0 && (
+                {!products && (
                   <tr>
                     <td colSpan={8}>No Products, Create more</td>
                   </tr>
