@@ -130,7 +130,7 @@ export const Order = ({ orderList, getOrderList, setAsDeliveredAdmin }) => {
                   type="checkbox"
                   onChange={() => onChangeHandle(_id)}
                   checked={updateTarget._id === _id ? true : false}
-                  disabled={isDelivered ? true : false}
+                  disabled={isDelivered ? true : !isPaid ? true : false}
                 />
               </td>
               <td>{_id}</td>

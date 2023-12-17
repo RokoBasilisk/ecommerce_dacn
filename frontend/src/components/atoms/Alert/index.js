@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { socket } from "../../../socket";
 
 const Alert = () => {
   useEffect(() => {});

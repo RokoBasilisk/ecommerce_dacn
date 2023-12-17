@@ -30,6 +30,7 @@ import {
   featuredMessageReducer,
 } from "./reducers/shopReducer";
 import { prefixAPI } from "./types";
+import { eventListReducer } from "./reducers/eventReducer";
 
 const reducer = combineReducers({
   featuredItemsPerCategory: featuredItemsPerCategoryReducer,
@@ -53,6 +54,7 @@ const reducer = combineReducers({
   orderPayment: orderPayReducer,
   orderList: orderListReducer,
   userList: userListReducer,
+  eventList: eventListReducer,
 });
 
 const storageCartItems = localStorage.getItem("cartItems")
