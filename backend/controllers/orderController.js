@@ -415,7 +415,13 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
 // @route GET /api/orders/myorders
 // @access Private
 export const getOrderUserOrders = asyncHandler(async (req, res) => {
-  const order = await OrderModel.find({ user: req.user._id });
+  const order = await OrderModel.find({ user: req.user._id })
+  .populate({
+    path: "orderItems",
+    populate: {
+      path: "productId",
+    },
+  });
   res.status(SUCCESS_HTTP_STATUS);
   res.json({success: true, orders: order});
 });
