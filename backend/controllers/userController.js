@@ -54,14 +54,22 @@ export const authUser = asyncHandler(async (req, res) => {
 // @route PATCH /api/users/profile
 // @access Private
 export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { name, oldPassword, newPassword, paypalEmail } = req.body;
   const user = await UserModel.findById(sanitize(req.user._id));
   if (user) {
-    user.name = sanitize(req.body.name) || user.name;
-    user.email = sanitize(req.body.email) || user.email;
-    if (req.body.password) {
-      user.password = sanitize(req.body.password);
+    if (oldPassword && newPassword) {
+      if (oldPassword !== user.password) {
+        res.status(FAIL_HTTP_STATUS);
+        throw new Error("Wrong password");
+      }
+      if (newPassword === user.password) {
+        res.status(FAIL_HTTP_STATUS);
+        throw new Error("Cannot change with the same password");
+      }
+      user.password = sanitize(newPassword);
     }
-    user.paypalEmail = sanitize(req.body.paypalEmail) || user.paypalEmail;
+    user.name = sanitize(name) || user.name;
+    user.paypalEmail = sanitize(paypalEmail) || user.paypalEmail;
     const updatedUser = await user.save();
     res.status(SUCCESS_HTTP_STATUS);
     return res.json({

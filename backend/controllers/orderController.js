@@ -417,5 +417,5 @@ export const putUpdateOrderToDelivered = asyncHandler(async (req, res) => {
 export const getOrderUserOrders = asyncHandler(async (req, res) => {
   const order = await OrderModel.find({ user: req.user._id });
   res.status(SUCCESS_HTTP_STATUS);
-  res.json(order);
+  res.json({success: true, orders: order});
 });
