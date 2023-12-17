@@ -6,6 +6,6 @@ import { isShop, protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(protect, isShop, getShopEvent);
+router.route("/").get(protect, getShopEvent);
 
 export default router;
