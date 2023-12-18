@@ -420,6 +420,7 @@ export const getOrderUserOrders = asyncHandler(async (req, res) => {
     path: "orderItems",
     populate: {
       path: "productId",
+      select: "name image"
     },
   });
   res.status(SUCCESS_HTTP_STATUS);
