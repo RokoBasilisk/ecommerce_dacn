@@ -11,6 +11,7 @@ import {
   SUCCESS_HTTP_STATUS,
 } from "../constanst/ResultResponse.js";
 import eventRepository from "../repository/eventRepository.js";
+import Category from "../models/categoryModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -96,10 +97,16 @@ export const getProductById = asyncHandler(async (req, res) => {
 // @route GET /api/products/category/name
 // @access Public
 export const getCategoryNames = asyncHandler(async (req, res) => {
-  const categoryNames = await ProductModel.distinct("category");
-  if (categoryNames.length > 0) {
+  const categoryNames = await Category.find({});
+  const categoryNameList = [];
+  console.log(categoryNames);
+  for (let {categoryName} of categoryNames) {
+    categoryNameList.push(categoryName);
+  }
+
+  if (categoryNameList.length > 0) {
     res.status(SUCCESS_HTTP_STATUS);
-    res.json(categoryNames);
+    res.json(categoryNameList);
   } else {
     res.json([]);
   }
