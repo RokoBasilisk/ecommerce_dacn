@@ -25,6 +25,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
 
   // Validate products
   if (products && products.length === 0) {
+    console.log("no Items")
     res.status(FAIL_HTTP_STATUS);
     throw new Error("No items in this order");
   } else {
@@ -41,6 +42,7 @@ export const addOrderItems = asyncHandler(async (req, res) => {
         })
         .catch((err) => {
           res.status(FAIL_HTTP_STATUS);
+          console.log("Item in order not found, try again later")
           throw new Error("Item in order not found, try again later");
         });
     }
@@ -52,8 +54,8 @@ export const addOrderItems = asyncHandler(async (req, res) => {
       paymentMethod: sanitize(paymentMethod || "PayPal"),
       totalPrice: sanitize(itemsPrice),
     });
-
     const createdOrder = await order.save();
+    console.log("save success")
     await eventRepository.add({
       eventTargetId: req.user._id,
       eventName: "addOrderItems",
