@@ -99,7 +99,6 @@ export const getProductById = asyncHandler(async (req, res) => {
 export const getCategoryNames = asyncHandler(async (req, res) => {
   const categoryNames = await Category.find({});
   const categoryNameList = [];
-  console.log(categoryNames);
   for (let {categoryName} of categoryNames) {
     categoryNameList.push(categoryName);
   }
@@ -123,8 +122,9 @@ export const getProductByCategory = asyncHandler(async (req, res) => {
     req.body.categories && req.body.categories.length > 0
       ? {
           category: { $in: sanitize(req.body.categories) },
+          isDeleted: false,
         }
-      : {};
+      : { isDeleted: false, };
 
   const count = await ProductModel.countDocuments(condition);
 
