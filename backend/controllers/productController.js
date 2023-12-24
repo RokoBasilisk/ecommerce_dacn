@@ -109,7 +109,7 @@ export const getReviewValid = asyncHandler(async (req, res) => {
     }
   });
 
-  if (!orderedProduct) {
+  if (orderedProduct.length == 0) {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Haven't order item yet");
   }
