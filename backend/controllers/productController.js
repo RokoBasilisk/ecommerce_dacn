@@ -119,7 +119,7 @@ export const getReviewValid = asyncHandler(async (req, res) => {
     reviews: { $elemMatch: { user: req.user._id } },
     isDeleted: false,
   });
-  if (product) {
+  if (!product) {
     res.status(SUCCESS_HTTP_STATUS);
     res.json({success: true});
   }
