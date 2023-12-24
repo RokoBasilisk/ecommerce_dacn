@@ -9,6 +9,7 @@ import {
   getProducts,
   getProductsByShop,
   updateProductAdmin,
+  getReviewValid
 } from "../controllers/productController.js";
 import { isShop, protect, isCustomer } from "../middleware/authMiddleware.js";
 
@@ -21,6 +22,8 @@ router.route("/").post(protect, isShop, createProductAdmin);
 router.route("/shop").get(protect, isShop, getProductsByShop);
 
 router.route("/:id").get(getProductById);
+
+router.route("/:id/review").get(protect, isCustomer, getReviewValid);
 
 router.route("/:id").delete(protect, isShop, deleteProductAdmin);
 
