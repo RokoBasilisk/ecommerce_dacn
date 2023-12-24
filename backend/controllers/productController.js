@@ -119,10 +119,12 @@ export const getReviewValid = asyncHandler(async (req, res) => {
     reviews: { $elemMatch: { user: req.user._id } },
     isDeleted: false,
   });
-  if (!product) {
-    res.status(SUCCESS_HTTP_STATUS);
-    res.json({success: true});
+  if (product) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("Product already rating");
   }
+  res.status(SUCCESS_HTTP_STATUS);
+  res.json({success: true});
 })
 
 // @desc Fetch all categories names
