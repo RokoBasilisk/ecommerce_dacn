@@ -298,7 +298,7 @@ export const addReview = asyncHandler(async (req, res) => {
 
     const updatedObj = await object.save();
     res.status(SUCCESS_HTTP_STATUS);
-    res.json(updatedObj);
+    res.json({success: true});
   } else {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Product not found");
