@@ -93,6 +93,38 @@ export const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Check user valid to review
+// @route GET /api/products/:id/review
+// @access private
+export const getReviewValid = asyncHandler(async (req, res) => {
+  if (!Mongoose.Types.ObjectId.isValid(sanitize(req.params.id))) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("Bad ObjectId");
+  }
+
+  const orderedProduct = await ProductModel.find({
+    user: req.user._id,
+    orderItems: {
+      $elemMatch: { productId: req.params.id }
+    }
+  });
+
+  if (!orderedProduct) {
+    res.status(FAIL_HTTP_STATUS);
+    throw new Error("Haven't order item yet");
+  }
+
+  const product = await ProductModel.find({
+    _id: sanitize(req.params.id),
+    reviews: { $elemMatch: { user: req.user._id } },
+    isDeleted: false,
+  });
+  if (product) {
+    res.status(SUCCESS_HTTP_STATUS);
+    res.json({success: true});
+  }
+})
+
 // @desc Fetch all categories names
 // @route GET /api/products/category/name
 // @access Public
