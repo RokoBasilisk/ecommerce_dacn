@@ -119,7 +119,7 @@ export const getReviewValid = asyncHandler(async (req, res) => {
     reviews: { $elemMatch: { user: req.user._id } },
     isDeleted: false,
   });
-  if (product) {
+  if (product.length == 0) {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Product already rating");
   }
