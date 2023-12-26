@@ -54,7 +54,7 @@ export const authUser = asyncHandler(async (req, res) => {
 // @route PATCH /api/users/profile
 // @access Private
 export const updateUserProfile = asyncHandler(async (req, res) => {
-  const { name, oldPassword, newPassword, paypalEmail } = req.body;
+  const { name, oldPassword, newPassword, paypalEmail, avatarUrl } = req.body;
   const user = await UserModel.findById(sanitize(req.user._id));
   if (user) {
     if (oldPassword && newPassword) {
@@ -70,6 +70,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     }
     user.name = sanitize(name) || user.name;
     user.paypalEmail = sanitize(paypalEmail) || user.paypalEmail;
+    user.avatarUrl = avatarUrl || user.avatarUrl;
     const updatedUser = await user.save();
     res.status(SUCCESS_HTTP_STATUS);
     return res.json({
@@ -78,6 +79,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       email: updatedUser.email,
       paypalEmail: updatedUser.paypalEmail,
       isShop: updatedUser.isShop,
+      avatarUrl: updatedUser.avatarUrl,
       token: generateToken(updatedUser._id),
     });
   } else {
