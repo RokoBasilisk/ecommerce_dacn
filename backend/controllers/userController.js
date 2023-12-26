@@ -80,6 +80,8 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       paypalEmail: updatedUser.paypalEmail,
       isShop: updatedUser.isShop,
       avatarUrl: updatedUser.avatarUrl,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
       token: generateToken(updatedUser._id),
     });
   } else {
@@ -154,6 +156,8 @@ export const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       avatarUrl: user.avatarUrl,
       isShop: user.isShop,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
       token: generateToken(user.id),
     });
   } else {
