@@ -295,6 +295,8 @@ export const getOrderById = asyncHandler(async (req, res) => {
 // @route GET /api/orders/
 // @access Private
 export const getAllOrders = asyncHandler(async (req, res) => {
+  const pageSize = 8;
+  const page = Number(req.body.pageNumber) | 1;
   // get all product is created by shop and exist in order
   const productsByShop = await ProductModel.aggregate([
     {
@@ -323,6 +325,38 @@ export const getAllOrders = asyncHandler(async (req, res) => {
     },
   ]);
 
+  // Get total order that exist product is created by shop
+  const count = await OrderModel.aggregate([
+    {
+      $match: {
+        "orderItems.productId": { $in: productsByShop.map((e) => e._id) }, // Match orders with product IDs in the provided array
+      },
+    },
+    {
+      $unwind: "$orderItems", // Unwind the orderItems array
+    },
+    {
+      $match: {
+        "orderItems.productId": { $in: productsByShop.map((e) => e._id) }, // Match orderItems with product IDs in the provided array
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        orderItems: { $push: "$orderItems" },
+        taxPrice: { $first: "$taxPrice" },
+        shippingPrice: { $first: "$shippingPrice" },
+        totalPrice: { $first: "$totalPrice" },
+        isPaid: { $first: "$isPaid" },
+        isDelivered: { $first: "$isDelivered" },
+        shippingAddress: { $first: "$shippingAddress" },
+        paymentMethod: { $first: "$paymentMethod" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+      },
+    },
+  ]);
+  
   // Get all order that exist product is created by shop
   const orders = await OrderModel.aggregate([
     {
@@ -353,7 +387,8 @@ export const getAllOrders = asyncHandler(async (req, res) => {
         updatedAt: { $first: "$updatedAt" },
       },
     },
-  ]);
+  ]).limit(pageSize)
+  .skip(pageSize * (page - 1));
 
   // populate orderItems.productId
   for (let order of orders) {
@@ -368,7 +403,7 @@ export const getAllOrders = asyncHandler(async (req, res) => {
 
   if (orders) {
     res.status(SUCCESS_HTTP_STATUS);
-    res.json(orders);
+    res.json({orders: orders, page, pages: Math.ceil(count / pageSize)});
   } else {
     res.status(FAIL_HTTP_STATUS);
     throw new Error("Order not found");
