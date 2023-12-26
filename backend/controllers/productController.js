@@ -207,6 +207,57 @@ export const deleteProductAdmin = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Recommend products
+// @route GET /api/products/recommend/:q
+// @access Private
+export const recommendProduct = asyncHandler(async (req, res) => {
+  const productId = req.params.q;
+
+  try {
+    const productRating = await ProductModel.find({
+      reviews: {
+        $elemMatch: { user: req.user._id }
+      }
+    })
+    if (
+      productRating == null ||
+      productRating == undefined ||
+      productRating.length == 0
+    ) {
+      const recommend = await axios.get(
+        `http://localhost:5500/nonrating?q=${productId}`
+      );
+
+      const response = await ProductModel.find({
+        _id: { $in: recommend.data.response },
+      });
+
+      if (response.length !== 0) {
+        console.log(response);
+        res.json({ success: true, products: response });
+      } else {
+        res.status(500).json({ success: false, Products: [] });
+      }
+    } else {
+      const recommend = await axios.get(`http://localhost:5500/?q=${req.user._id}`);
+
+      const response = await ProductModel.find({
+        _id: { $in: recommend.data.response },
+      });
+
+      if (response.length !== 0) {
+        console.log(response);
+        res.json({ success: true, Products: response });
+      } else {
+        res.status(500).json({ success: false, Products: [] });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+})
+
 // @desc Create a product
 // @route POST /api/product/
 // @access Private
