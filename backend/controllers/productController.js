@@ -233,7 +233,6 @@ export const recommendProduct = asyncHandler(async (req, res) => {
       });
 
       if (response.length !== 0) {
-        console.log(response);
         res.json({ success: true, products: response });
       } else {
         res.status(500).json({ success: false, Products: [] });
@@ -246,10 +245,9 @@ export const recommendProduct = asyncHandler(async (req, res) => {
       });
 
       if (response.length !== 0) {
-        console.log(response);
-        res.json({ success: true, Products: response });
+        res.json({ success: true, products: response });
       } else {
-        res.status(500).json({ success: false, Products: [] });
+        res.status(500).json({ success: false, products: [] });
       }
     }
   } catch (error) {
